@@ -544,17 +544,37 @@
   function checkAnswer(index) {
     var problem = problems[index];
     var canvas = drawAnswerImage(problem, index);
-    canvas.toBlob(function (blob) {
+    var filename = "daily-math-" + dateStr + "-problem" + (index + 1) + "-answer.png";
+
+    canvas.toBlob(async function (blob) {
       if (!blob) return;
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement("a");
-      a.href = url;
-      a.download = "daily-math-" + dateStr + "-problem" + (index + 1) + "-answer.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-      showToast("정답 이미지를 저장했어요");
+
+      if (window.claude && typeof window.claude.use === "function") {
+        try {
+          var downloads = await window.claude.use("downloads");
+          if (downloads) {
+            await downloads.save({ filename: filename, data: blob });
+            showToast("정답 이미지를 저장했어요");
+            return;
+          }
+        } catch (err) {
+          if (err && err.code === "declined") return;
+        }
+      }
+
+      try {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+        showToast("정답 이미지를 저장했어요");
+      } catch (err) {
+        showToast("이 브라우저에서는 다운로드를 지원하지 않아요");
+      }
     }, "image/png");
   }
 

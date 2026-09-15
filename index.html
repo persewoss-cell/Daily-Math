@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>매일 수학</title>
+<meta name="description" content="매일 같은 날엔 같은 두 자리 수 곱셈 문제, 난이도를 고르고 정답은 이미지로 저장하는 연산 연습 사이트" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root {
+    color-scheme: light;
+    --paper: #f3f5fb;
+    --paper-line: #ccd6f0;
+    --ink: #1d2440;
+    --ink-soft: #55608a;
+    --surface: #ffffff;
+    --surface-border: #d7def2;
+    --accent: #4c5fd5;
+    --accent-ink: #3a49b0;
+    --accent-soft: #e4e7fb;
+    --red-pen: #d6483c;
+    --red-pen-ink: #b8382e;
+    --red-soft: #fbe1de;
+    --green: #2e9e6c;
+    --green-soft: #def3e8;
+    --amber: #b8791f;
+    --amber-soft: #f7e9d2;
+    --shadow: 0 1px 2px rgba(29,36,64,0.06), 0 10px 26px -14px rgba(29,36,64,0.22);
+    --font-display: 'Gaegu', 'Nanum Pen Script', 'Comic Sans MS', sans-serif;
+    --font-body: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Space Mono', Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --paper: #10142a;
+      --paper-line: #232b52;
+      --ink: #e8eaf7;
+      --ink-soft: #a9b0d6;
+      --surface: #171c38;
+      --surface-border: #2b3363;
+      --accent: #8892f0;
+      --accent-ink: #a6aef5;
+      --accent-soft: #262c58;
+      --red-pen: #ff8477;
+      --red-pen-ink: #ff9d92;
+      --red-soft: #3c1f1d;
+      --green: #5fd0a0;
+      --green-soft: #1c3a2e;
+      --amber: #e9ae55;
+      --amber-soft: #3b2e17;
+      --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 14px 30px -16px rgba(0,0,0,0.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --paper: #10142a;
+    --paper-line: #232b52;
+    --ink: #e8eaf7;
+    --ink-soft: #a9b0d6;
+    --surface: #171c38;
+    --surface-border: #2b3363;
+    --accent: #8892f0;
+    --accent-ink: #a6aef5;
+    --accent-soft: #262c58;
+    --red-pen: #ff8477;
+    --red-pen-ink: #ff9d92;
+    --red-soft: #3c1f1d;
+    --green: #5fd0a0;
+    --green-soft: #1c3a2e;
+    --amber: #e9ae55;
+    --amber-soft: #3b2e17;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 14px 30px -16px rgba(0,0,0,0.6);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    padding: calc(20px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background-color: var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: -1px -1px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-variant-numeric: tabular-nums;
+  }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  h1, h2, h3 { text-wrap: balance; }
+  button { font: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .page { max-width: 1080px; margin: 0 auto; }
+
+  .masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 20px;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 2px dashed var(--paper-line);
+  }
+  .brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+  .brand svg { width: 40px; height: 40px; flex-shrink: 0; color: var(--accent); }
+  .brand h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    margin: 0;
+    line-height: 1;
+  }
+  .brand .tagline {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .today {
+    text-align: right;
+    line-height: 1.3;
+  }
+  .today-label {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+  }
+  .today-date {
+    display: block;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 9px 14px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.12s ease, background-color 0.12s ease, border-color 0.12s ease;
+    white-space: nowrap;
+  }
+  .btn svg { width: 16px; height: 16px; }
+  .btn:active { transform: translateY(1px); }
+  .btn-ghost {
+    background: var(--surface);
+    border-color: var(--surface-border);
+    color: var(--ink);
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .btn-shuffle {
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+  }
+  .btn-shuffle:hover { background: var(--accent); color: #fff; }
+  .btn-check {
+    background: var(--red-soft);
+    color: var(--red-pen-ink);
+  }
+  .btn-check:hover { background: var(--red-pen); color: #fff; }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .problem-no {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+  .diff-group {
+    display: inline-flex;
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .diff-btn {
+    border: none;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-right: 1px solid var(--surface-border);
+  }
+  .diff-btn:last-child { border-right: none; }
+  .diff-btn:hover { background: var(--paper); }
+  .diff-btn[aria-pressed="true"][data-diff="하"] { background: var(--green); color: #fff; }
+  .diff-btn[aria-pressed="true"][data-diff="중"] { background: var(--amber); color: #fff; }
+  .diff-btn[aria-pressed="true"][data-diff="상"] { background: var(--red-pen); color: #fff; }
+
+  .problem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(2.3rem, 8vw, 3.1rem);
+    line-height: 1.15;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  .problem .top-num { padding-right: 2px; }
+  .problem .bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5em;
+    width: 100%;
+  }
+  .problem .op { color: var(--accent); }
+  .problem .rule {
+    width: 100%;
+    border-top: 3px solid var(--ink);
+    margin-top: 2px;
+  }
+  .problem .workspace {
+    width: 100%;
+    height: 84px;
+    margin-top: 14px;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 25px,
+      var(--paper-line) 26px
+    );
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-actions .btn { flex: 1 1 auto; justify-content: center; }
+
+  .note {
+    margin-top: 26px;
+    padding-top: 16px;
+    border-top: 2px dashed var(--paper-line);
+    color: var(--ink-soft);
+    font-size: 0.82rem;
+    line-height: 1.6;
+    max-width: 65ch;
+  }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 12px);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .toast { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <div class="brand">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="5" y="7" width="38" height="34" rx="4"></rect>
+        <line x1="5" y1="18" x2="43" y2="18"></line>
+        <line x1="16" y1="7" x2="16" y2="41"></line>
+        <line x1="29.5" y1="7" x2="29.5" y2="41"></line>
+        <line x1="11" y1="27" x2="21" y2="27"></line>
+        <line x1="24" y1="27" x2="34" y2="27"></line>
+      </svg>
+      <div>
+        <h1>매일 수학</h1>
+        <p class="tagline">두 자리 수 &times; 두 자리 수 곱셈 연습</p>
+      </div>
+    </div>
+    <div class="today">
+      <span class="today-label">오늘의 문제</span>
+      <span class="today-date" id="today-date"></span>
+    </div>
+    <button class="btn btn-ghost" id="refresh-all" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="16 3 21 3 21 8"></polyline>
+        <line x1="21" y1="3" x2="10" y2="14"></line>
+        <path d="M21 13v3a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5h3"></path>
+      </svg>
+      전체 새 문제
+    </button>
+  </header>
+
+  <main class="board" id="board">
+    <article class="card" data-index="0">
+      <div class="card-top">
+        <span class="problem-no">문제 1</span>
+        <div class="diff-group" role="group" aria-label="문제 1 난이도 선택">
+          <button type="button" class="diff-btn" data-diff="하">하</button>
+          <button type="button" class="diff-btn" data-diff="중">중</button>
+          <button type="button" class="diff-btn" data-diff="상">상</button>
+        </div>
+      </div>
+      <div class="problem">
+        <div class="num top-num" data-role="a">00</div>
+        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
+        <div class="rule"></div>
+        <div class="workspace" aria-hidden="true"></div>
+      </div>
+      <div class="card-actions">
+        <button type="button" class="btn btn-shuffle" data-action="shuffle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          다른 문제
+        </button>
+        <button type="button" class="btn btn-check" data-action="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
+          정답 확인
+        </button>
+      </div>
+    </article>
+
+    <article class="card" data-index="1">
+      <div class="card-top">
+        <span class="problem-no">문제 2</span>
+        <div class="diff-group" role="group" aria-label="문제 2 난이도 선택">
+          <button type="button" class="diff-btn" data-diff="하">하</button>
+          <button type="button" class="diff-btn" data-diff="중">중</button>
+          <button type="button" class="diff-btn" data-diff="상">상</button>
+        </div>
+      </div>
+      <div class="problem">
+        <div class="num top-num" data-role="a">00</div>
+        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
+        <div class="rule"></div>
+        <div class="workspace" aria-hidden="true"></div>
+      </div>
+      <div class="card-actions">
+        <button type="button" class="btn btn-shuffle" data-action="shuffle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          다른 문제
+        </button>
+        <button type="button" class="btn btn-check" data-action="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
+          정답 확인
+        </button>
+      </div>
+    </article>
+
+    <article class="card" data-index="2">
+      <div class="card-top">
+        <span class="problem-no">문제 3</span>
+        <div class="diff-group" role="group" aria-label="문제 3 난이도 선택">
+          <button type="button" class="diff-btn" data-diff="하">하</button>
+          <button type="button" class="diff-btn" data-diff="중">중</button>
+          <button type="button" class="diff-btn" data-diff="상">상</button>
+        </div>
+      </div>
+      <div class="problem">
+        <div class="num top-num" data-role="a">00</div>
+        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
+        <div class="rule"></div>
+        <div class="workspace" aria-hidden="true"></div>
+      </div>
+      <div class="card-actions">
+        <button type="button" class="btn btn-shuffle" data-action="shuffle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          다른 문제
+        </button>
+        <button type="button" class="btn btn-check" data-action="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
+          정답 확인
+        </button>
+      </div>
+    </article>
+  </main>
+
+  <footer class="note">
+    <p>날짜가 같으면 같은 문제가 나와요. 난이도를 바꾸거나 "다른 문제"를 누르면 새 문제로 바뀝니다. "정답 확인"을 누르면 화면에는 표시되지 않고, 정답이 작은 이미지 파일로 저장돼요.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DIFF_RANGES = {
+    "하": { min: 10, max: 25 },
+    "중": { min: 20, max: 60 },
+    "상": { min: 50, max: 99 }
+  };
+  var DEFAULT_DIFF = "중";
+
+  function mulberry32(seed) {
+    return function () {
+      seed |= 0;
+      seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function hashString(str) {
+    var h = 1779033703 ^ str.length;
+    for (var i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return (h ^ (h >>> 16)) >>> 0;
+  }
+
+  function randInt(rng, min, max) {
+    return Math.floor(rng() * (max - min + 1)) + min;
+  }
+
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function makeProblem(diff, rng) {
+    var range = DIFF_RANGES[diff];
+    var a = randInt(rng, range.min, range.max);
+    var b = randInt(rng, range.min, range.max);
+    return { a: a, b: b, diff: diff, answer: a * b };
+  }
+
+  var dateStr = todayKey();
+  var dailyRng = mulberry32(hashString(dateStr));
+  var problems = [
+    makeProblem(DEFAULT_DIFF, dailyRng),
+    makeProblem(DEFAULT_DIFF, dailyRng),
+    makeProblem(DEFAULT_DIFF, dailyRng)
+  ];
+
+  var board = document.getElementById("board");
+  var cards = Array.prototype.slice.call(board.querySelectorAll(".card"));
+
+  var weekday = ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
+  document.getElementById("today-date").textContent =
+    new Date().getFullYear() + "년 " + (new Date().getMonth() + 1) + "월 " + new Date().getDate() + "일 (" + weekday + ")";
+
+  function renderCard(index) {
+    var card = cards[index];
+    var p = problems[index];
+    card.querySelector('[data-role="a"]').textContent = p.a;
+    card.querySelector('[data-role="b"]').textContent = p.b;
+    var buttons = card.querySelectorAll(".diff-btn");
+    buttons.forEach(function (btn) {
+      var isActive = btn.getAttribute("data-diff") === p.diff;
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+    });
+    card.querySelector(".problem").setAttribute(
+      "aria-label",
+      p.a + " 곱하기 " + p.b + ", 난이도 " + p.diff
+    );
+  }
+
+  function renderAll() {
+    for (var i = 0; i < problems.length; i++) renderCard(i);
+  }
+
+  var toastEl = document.getElementById("toast");
+  var toastTimer = null;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () {
+      toastEl.classList.remove("show");
+    }, 2200);
+  }
+
+  function drawAnswerImage(problem, index) {
+    var scale = 2;
+    var w = 420, h = 180;
+    var canvas = document.createElement("canvas");
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    var ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = "#f3f5fb";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#d7def2";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, w - 2, h - 2);
+
+    ctx.fillStyle = "#55608a";
+    ctx.font = "13px 'Gowun Dodum', sans-serif";
+    ctx.fillText("매일 수학 · " + dateStr + " · 문제 " + (index + 1) + " · 난이도 " + problem.diff, 20, 30);
+
+    ctx.fillStyle = "#1d2440";
+    ctx.font = "bold 40px 'JetBrains Mono', monospace";
+    ctx.textBaseline = "middle";
+    ctx.fillText(problem.a + " × " + problem.b + " = " + problem.answer, 20, 100);
+
+    ctx.fillStyle = "#d6483c";
+    ctx.font = "13px 'Gowun Dodum', sans-serif";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("정답 확인용 이미지 (학생 화면에는 표시되지 않음)", 20, h - 18);
+
+    return canvas;
+  }
+
+  function checkAnswer(index) {
+    var problem = problems[index];
+    var canvas = drawAnswerImage(problem, index);
+    canvas.toBlob(function (blob) {
+      if (!blob) return;
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "daily-math-" + dateStr + "-problem" + (index + 1) + "-answer.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      showToast("정답 이미지를 저장했어요");
+    }, "image/png");
+  }
+
+  board.addEventListener("click", function (e) {
+    var diffBtn = e.target.closest(".diff-btn");
+    var actionBtn = e.target.closest("[data-action]");
+    var card = e.target.closest(".card");
+    if (!card) return;
+    var index = Number(card.getAttribute("data-index"));
+
+    if (diffBtn) {
+      var diff = diffBtn.getAttribute("data-diff");
+      if (diff !== problems[index].diff) {
+        problems[index] = makeProblem(diff, Math.random);
+        renderCard(index);
+      }
+      return;
+    }
+
+    if (actionBtn) {
+      var action = actionBtn.getAttribute("data-action");
+      if (action === "shuffle") {
+        problems[index] = makeProblem(problems[index].diff, Math.random);
+        renderCard(index);
+      } else if (action === "check") {
+        checkAnswer(index);
+      }
+    }
+  });
+
+  document.getElementById("refresh-all").addEventListener("click", function () {
+    for (var i = 0; i < problems.length; i++) {
+      problems[i] = makeProblem(problems[i].diff, Math.random);
+    }
+    renderAll();
+    showToast("문제 3개를 새로 냈어요");
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

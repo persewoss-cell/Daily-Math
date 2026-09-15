@@ -263,6 +263,16 @@
     flex-wrap: wrap;
   }
   .card-actions .btn { flex: 1 1 auto; justify-content: center; }
+  .card-actions .btn-undo {
+    flex: 0 0 auto;
+    width: 38px;
+    padding: 9px;
+    background: var(--surface);
+    border-color: var(--surface-border);
+    color: var(--ink-soft);
+  }
+  .card-actions .btn-undo:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-ink); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
 
   .footer-bar {
     margin-top: 26px;
@@ -397,6 +407,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
           다른 문제
         </button>
+        <button type="button" class="btn btn-undo" data-action="undo" title="되돌리기" aria-label="이전 문제로 되돌리기" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
+        </button>
         <button type="button" class="btn btn-check" data-action="check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
           정답 확인
@@ -424,6 +437,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
           다른 문제
         </button>
+        <button type="button" class="btn btn-undo" data-action="undo" title="되돌리기" aria-label="이전 문제로 되돌리기" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
+        </button>
         <button type="button" class="btn btn-check" data-action="check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
           정답 확인
@@ -450,6 +466,9 @@
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
           다른 문제
+        </button>
+        <button type="button" class="btn btn-undo" data-action="undo" title="되돌리기" aria-label="이전 문제로 되돌리기" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
         </button>
         <button type="button" class="btn btn-check" data-action="check">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
@@ -530,6 +549,12 @@
   var problems = DEFAULT_DIFFS.map(function (diff) {
     return makeProblem(diff, dailyRng);
   });
+  var history = problems.map(function () { return []; });
+
+  function replaceProblem(index, diff, rng) {
+    history[index].push(problems[index]);
+    problems[index] = makeProblem(diff, rng);
+  }
 
   var board = document.getElementById("board");
   var cards = Array.prototype.slice.call(board.querySelectorAll(".card"));
@@ -552,6 +577,7 @@
       "aria-label",
       p.a + " 곱하기 " + p.b + ", 난이도 " + p.diff
     );
+    card.querySelector('[data-action="undo"]').disabled = history[index].length === 0;
   }
 
   function renderAll() {
@@ -691,7 +717,7 @@
     if (diffBtn) {
       var diff = diffBtn.getAttribute("data-diff");
       if (diff !== problems[index].diff) {
-        problems[index] = makeProblem(diff, Math.random);
+        replaceProblem(index, diff, Math.random);
         renderCard(index);
       }
       return;
@@ -700,8 +726,13 @@
     if (actionBtn) {
       var action = actionBtn.getAttribute("data-action");
       if (action === "shuffle") {
-        problems[index] = makeProblem(problems[index].diff, Math.random);
+        replaceProblem(index, problems[index].diff, Math.random);
         renderCard(index);
+      } else if (action === "undo") {
+        if (history[index].length > 0) {
+          problems[index] = history[index].pop();
+          renderCard(index);
+        }
       } else if (action === "check") {
         openAnswerModal(index);
       }
@@ -710,7 +741,7 @@
 
   document.getElementById("refresh-all").addEventListener("click", function () {
     for (var i = 0; i < problems.length; i++) {
-      problems[i] = makeProblem(problems[i].diff, Math.random);
+      replaceProblem(i, problems[i].diff, Math.random);
     }
     renderAll();
     showToast("문제 3개를 새로 냈어요");

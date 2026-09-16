@@ -279,7 +279,15 @@
     padding-top: 16px;
     border-top: 2px dashed var(--paper-line);
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .credit {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
   }
 
   .modal-overlay {
@@ -479,6 +487,7 @@
   </main>
 
   <footer class="footer-bar">
+    <p class="credit">만든이: 강형권 선생님</p>
     <button type="button" class="btn btn-check" id="save-all-answers">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="4" y1="19" x2="20" y2="19"></line></svg>
       전체 정답 이미지로 저장
@@ -502,10 +511,10 @@
 (function () {
   "use strict";
 
-  var DIFF_RANGES = {
-    "하": { min: 10, max: 25 },
-    "중": { min: 20, max: 60 },
-    "상": { min: 50, max: 99 }
+  var DIFF_DIGITS = {
+    "하": { tens: [1, 2], units: [0, 9] },
+    "중": { tens: [3, 5], units: [3, 9] },
+    "상": { tens: [6, 9], units: [3, 9] }
   };
   var DEFAULT_DIFFS = ["하", "중", "상"];
 
@@ -537,10 +546,16 @@
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
   }
 
+  function randDigitNumber(rng, digits) {
+    var tens = randInt(rng, digits.tens[0], digits.tens[1]);
+    var units = randInt(rng, digits.units[0], digits.units[1]);
+    return tens * 10 + units;
+  }
+
   function makeProblem(diff, rng) {
-    var range = DIFF_RANGES[diff];
-    var a = randInt(rng, range.min, range.max);
-    var b = randInt(rng, range.min, range.max);
+    var digits = DIFF_DIGITS[diff];
+    var a = randDigitNumber(rng, digits);
+    var b = randDigitNumber(rng, digits);
     return { a: a, b: b, diff: diff, answer: a * b };
   }
 

@@ -289,6 +289,11 @@
     font-size: 0.82rem;
     color: var(--ink-soft);
   }
+  .footer-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
 
   .modal-overlay {
     position: fixed;
@@ -488,10 +493,16 @@
 
   <footer class="footer-bar">
     <p class="credit">만든이: 강형권 선생님</p>
-    <button type="button" class="btn btn-check" id="save-all-answers">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="4" y1="19" x2="20" y2="19"></line></svg>
-      전체 정답 이미지로 저장
-    </button>
+    <div class="footer-actions">
+      <button type="button" class="btn btn-shuffle" id="save-all-problems">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3v5a1 1 0 0 0 1 1h5"></path><path d="M6 3h8l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line></svg>
+        전체 문제 저장
+      </button>
+      <button type="button" class="btn btn-check" id="save-all-answers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="4" y1="19" x2="20" y2="19"></line></svg>
+        전체 정답 이미지로 저장
+      </button>
+    </div>
   </footer>
 </div>
 
@@ -645,6 +656,69 @@
     ctx.closePath();
   }
 
+  function drawAllProblemsImage() {
+    var scale = 2;
+    var cardW = 260, gap = 18, padding = 20, top = 42, cardH = 210;
+    var w = padding * 2 + cardW * problems.length + gap * (problems.length - 1);
+    var h = top + cardH + padding;
+    var canvas = document.createElement("canvas");
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    var ctx = canvas.getContext("2d");
+    ctx.scale(scale, scale);
+
+    ctx.fillStyle = "#f3f5fb";
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.fillStyle = "#1d2440";
+    ctx.font = "bold 16px 'Gowun Dodum', sans-serif";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText("매일 수학 · " + dateStr + " 문제", padding, 26);
+
+    problems.forEach(function (p, i) {
+      var x = padding + i * (cardW + gap);
+      var right = x + cardW - 18;
+
+      ctx.fillStyle = "#ffffff";
+      ctx.strokeStyle = "#d7def2";
+      ctx.lineWidth = 2;
+      roundRect(ctx, x, top, cardW, cardH, 12);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#55608a";
+      ctx.font = "13px 'Gowun Dodum', sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("문제 " + (i + 1) + " · 난이도 " + p.diff, x + 18, top + 26);
+
+      ctx.fillStyle = "#1d2440";
+      ctx.font = "bold 34px 'JetBrains Mono', monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(String(p.a), right, top + 66);
+      ctx.fillText("× " + p.b, right, top + 106);
+
+      ctx.strokeStyle = "#1d2440";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 18, top + 118);
+      ctx.lineTo(right, top + 118);
+      ctx.stroke();
+
+      ctx.strokeStyle = "#d7def2";
+      ctx.lineWidth = 1;
+      for (var ly = top + 142; ly < top + cardH - 14; ly += 24) {
+        ctx.beginPath();
+        ctx.moveTo(x + 18, ly);
+        ctx.lineTo(right, ly);
+        ctx.stroke();
+      }
+      ctx.textAlign = "left";
+    });
+
+    return canvas;
+  }
+
   function drawAllAnswersImage() {
     var scale = 2;
     var cardW = 320, gap = 18, padding = 20, top = 42, cardH = 120;
@@ -760,6 +834,13 @@
     }
     renderAll();
     showToast("문제 3개를 새로 냈어요");
+  });
+
+  document.getElementById("save-all-problems").addEventListener("click", async function () {
+    var canvas = drawAllProblemsImage();
+    var filename = "daily-math-" + dateStr + "-problems.png";
+    var ok = await saveBlob(canvas, filename);
+    if (ok) showToast("문제 이미지를 저장했어요");
   });
 
   document.getElementById("save-all-answers").addEventListener("click", async function () {

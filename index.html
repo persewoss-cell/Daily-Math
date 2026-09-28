@@ -338,11 +338,18 @@
     font-size: 0.82rem;
     color: var(--ink-soft);
   }
-  .modal-answer {
-    margin: 0;
+  .modal-calc {
     font-family: var(--font-mono);
     font-weight: 700;
-    font-size: clamp(1.6rem, 7vw, 2.15rem);
+    font-size: clamp(1.3rem, 6vw, 1.7rem);
+    line-height: 1.3;
+    width: fit-content;
+    margin: 0 auto;
+  }
+  .modal-calc > div { width: 100%; text-align: right; }
+  .modal-rule { border-top: 2px solid var(--ink); margin: 4px 0; }
+  .modal-sum {
+    font-size: clamp(1.7rem, 7vw, 2.15rem);
     color: var(--red-pen-ink);
   }
 
@@ -679,12 +686,20 @@
 </div>
 
 <div class="modal-overlay" id="answer-modal" hidden>
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="answer-modal-text">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="answer-modal-meta">
     <button type="button" class="modal-close" id="answer-modal-close" aria-label="닫기">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>
     </button>
     <p class="modal-eyebrow" id="answer-modal-meta"></p>
-    <p class="modal-answer" id="answer-modal-text"></p>
+    <div class="modal-calc" id="answer-modal-calc">
+      <div data-role="a"></div>
+      <div>&times; <span data-role="b"></span></div>
+      <div class="modal-rule"></div>
+      <div data-role="p1"></div>
+      <div data-role="p2"></div>
+      <div class="modal-rule"></div>
+      <div class="modal-sum" data-role="sum"></div>
+    </div>
   </div>
 </div>
 
@@ -821,13 +836,23 @@
 
   var answerModal = document.getElementById("answer-modal");
   var answerModalMeta = document.getElementById("answer-modal-meta");
-  var answerModalText = document.getElementById("answer-modal-text");
+  var answerModalCalc = document.getElementById("answer-modal-calc");
   var answerModalClose = document.getElementById("answer-modal-close");
 
   function openAnswerModal(index) {
     var p = problems[index];
+    var tens = Math.floor(p.b / 10);
+    var units = p.b % 10;
+    var p1 = p.a * units;
+    var p2 = p.a * tens;
+
     answerModalMeta.textContent = "문제 " + (index + 1) + " · 난이도 " + p.diff;
-    answerModalText.textContent = p.a + " × " + p.b + " = " + p.answer;
+    answerModalCalc.querySelector('[data-role="a"]').textContent = p.a;
+    answerModalCalc.querySelector('[data-role="b"]').textContent = p.b;
+    answerModalCalc.querySelector('[data-role="p1"]').textContent = p1;
+    answerModalCalc.querySelector('[data-role="p2"]').textContent = p2 + " ";
+    answerModalCalc.querySelector('[data-role="sum"]').textContent = p.answer;
+    answerModalCalc.setAttribute("aria-label", p.a + " 곱하기 " + p.b + "는 " + p.answer + "입니다");
     answerModal.hidden = false;
     answerModalClose.focus();
   }
@@ -919,7 +944,7 @@
 
   function drawAllAnswersImage() {
     var scale = 2;
-    var cardW = 320, gap = 18, padding = 20, top = 42, cardH = 120;
+    var cardW = 260, gap = 18, padding = 20, top = 42, cardH = 245;
     var w = padding * 2 + cardW * problems.length + gap * (problems.length - 1);
     var h = top + cardH + padding;
     var canvas = document.createElement("canvas");
@@ -933,11 +958,14 @@
 
     ctx.fillStyle = "#1d2440";
     ctx.font = "bold 16px 'Gowun Dodum', sans-serif";
+    ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
-    ctx.fillText("매일 수학 · " + dateStr + " 정답", padding, 26);
+    ctx.fillText("매일 수학 · " + dateStr + " 풀이", padding, 26);
 
     problems.forEach(function (p, i) {
       var x = padding + i * (cardW + gap);
+      var right = x + cardW - 18;
+
       ctx.fillStyle = "#ffffff";
       ctx.strokeStyle = "#d7def2";
       ctx.lineWidth = 2;
@@ -947,11 +975,49 @@
 
       ctx.fillStyle = "#55608a";
       ctx.font = "13px 'Gowun Dodum', sans-serif";
-      ctx.fillText("문제 " + (i + 1) + " · 난이도 " + p.diff, x + 16, top + 28);
+      ctx.textAlign = "left";
+      ctx.fillText("문제 " + (i + 1) + " · 난이도 " + p.diff, x + 18, top + 24);
+
+      var tens = Math.floor(p.b / 10);
+      var units = p.b % 10;
+      var p1 = p.a * units;
+      var p2 = p.a * tens;
 
       ctx.fillStyle = "#1d2440";
-      ctx.font = "bold 24px 'JetBrains Mono', monospace";
-      ctx.fillText(p.a + " × " + p.b + " = " + p.answer, x + 16, top + 68);
+      ctx.font = "bold 26px 'JetBrains Mono', monospace";
+      ctx.textAlign = "right";
+      var y = top + 58;
+      ctx.fillText(String(p.a), right, y);
+      y += 32;
+      ctx.fillText("× " + p.b, right, y);
+
+      y += 8;
+      ctx.strokeStyle = "#1d2440";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 18, y);
+      ctx.lineTo(right, y);
+      ctx.stroke();
+
+      ctx.font = "20px 'JetBrains Mono', monospace";
+      var charWidth = ctx.measureText("0").width;
+      y += 28;
+      ctx.fillText(String(p1), right, y);
+      y += 26;
+      ctx.fillText(String(p2), right - charWidth, y);
+
+      y += 8;
+      ctx.beginPath();
+      ctx.moveTo(x + 18, y);
+      ctx.lineTo(right, y);
+      ctx.stroke();
+
+      ctx.fillStyle = "#d6483c";
+      ctx.font = "bold 30px 'JetBrains Mono', monospace";
+      y += 34;
+      ctx.fillText(String(p.answer), right, y);
+
+      ctx.textAlign = "left";
     });
 
     return canvas;

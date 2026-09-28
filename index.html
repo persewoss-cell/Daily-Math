@@ -366,6 +366,84 @@
   @media (prefers-reduced-motion: reduce) {
     .btn, .toast { transition: none; }
   }
+
+  .print-sheet { display: none; }
+
+  @media print {
+    @page { size: A4 landscape; margin: 10mm; }
+    .page, .modal-overlay, .toast { display: none !important; }
+    html, body { height: auto; }
+    body { background: #fff; padding: 0; }
+    .print-sheet {
+      display: block;
+      background: #fff;
+      color: #111;
+      font-family: 'Gowun Dodum', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+    .print-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10mm;
+      padding-bottom: 4mm;
+      border-bottom: 1px solid #999;
+    }
+    .print-title { font-size: 15pt; font-weight: 700; }
+    .print-name-row { display: flex; align-items: baseline; gap: 3mm; }
+    .print-name-label { font-size: 12pt; font-weight: 600; }
+    .print-name-line { width: 55mm; border-bottom: 1px solid #111; height: 6mm; }
+    .print-problems {
+      display: flex;
+      justify-content: space-between;
+      gap: 10mm;
+      margin-top: 6mm;
+    }
+    .print-problem {
+      flex: 1;
+      min-height: 100mm;
+      border: 1px solid #ccc;
+      border-radius: 3mm;
+      padding: 5mm;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .print-problem .pp-label {
+      align-self: flex-start;
+      font-size: 9pt;
+      color: #666;
+      margin-bottom: 4mm;
+    }
+    .print-problem .pp-nums {
+      font-family: 'JetBrains Mono', 'Space Mono', Consolas, monospace;
+      font-weight: 700;
+      font-size: 26pt;
+      line-height: 1.2;
+      width: 100%;
+      text-align: right;
+    }
+    .print-problem .pp-rule {
+      width: 100%;
+      border-top: 2px solid #111;
+      margin-top: 2mm;
+    }
+    .print-divider {
+      border-top: 2px dashed #333;
+      margin: 8mm 0 6mm;
+    }
+    .print-answers {
+      display: flex;
+      justify-content: space-between;
+      gap: 10mm;
+    }
+    .print-answer {
+      flex: 1;
+      text-align: center;
+      font-family: 'JetBrains Mono', 'Space Mono', Consolas, monospace;
+      font-size: 13pt;
+      font-weight: 600;
+    }
+  }
 </style>
 </head>
 <body>
@@ -502,8 +580,54 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="4" y1="19" x2="20" y2="19"></line></svg>
         전체 정답 이미지로 저장
       </button>
+      <button type="button" class="btn btn-ghost" id="print-worksheet">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        인쇄
+      </button>
     </div>
   </footer>
+</div>
+
+<div class="print-sheet" id="print-sheet" aria-hidden="true">
+  <div class="print-header">
+    <div class="print-title">매일 수학 문제지 · <span id="print-date-text"></span></div>
+    <div class="print-name-row">
+      <span class="print-name-label">이름</span>
+      <span class="print-name-line"></span>
+    </div>
+  </div>
+  <div class="print-problems">
+    <div class="print-problem" data-index="0">
+      <div class="pp-label" data-role="label"></div>
+      <div class="pp-nums">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+      </div>
+      <div class="pp-rule"></div>
+    </div>
+    <div class="print-problem" data-index="1">
+      <div class="pp-label" data-role="label"></div>
+      <div class="pp-nums">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+      </div>
+      <div class="pp-rule"></div>
+    </div>
+    <div class="print-problem" data-index="2">
+      <div class="pp-label" data-role="label"></div>
+      <div class="pp-nums">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+      </div>
+      <div class="pp-rule"></div>
+    </div>
+  </div>
+  <div class="print-divider"></div>
+  <div class="print-answers">
+    <div class="print-answer" data-index="0"></div>
+    <div class="print-answer" data-index="1"></div>
+    <div class="print-answer" data-index="2"></div>
+  </div>
 </div>
 
 <div class="modal-overlay" id="answer-modal" hidden>
@@ -586,8 +710,10 @@
   var cards = Array.prototype.slice.call(board.querySelectorAll(".card"));
 
   var weekday = ["일", "월", "화", "수", "목", "금", "토"][new Date().getDay()];
-  document.getElementById("today-date").textContent =
+  var todayDisplay =
     new Date().getFullYear() + "년 " + (new Date().getMonth() + 1) + "월 " + new Date().getDate() + "일 (" + weekday + ")";
+  document.getElementById("today-date").textContent = todayDisplay;
+  document.getElementById("print-date-text").textContent = todayDisplay;
 
   function renderCard(index) {
     var card = cards[index];
@@ -608,6 +734,18 @@
 
   function renderAll() {
     for (var i = 0; i < problems.length; i++) renderCard(i);
+  }
+
+  var printProblemEls = document.querySelectorAll(".print-problem");
+  var printAnswerEls = document.querySelectorAll(".print-answer");
+  function renderPrintSheet() {
+    problems.forEach(function (p, i) {
+      var card = printProblemEls[i];
+      card.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " · 난이도 " + p.diff;
+      card.querySelector('[data-role="a"]').textContent = p.a;
+      card.querySelector('[data-role="b"]').textContent = p.b;
+      printAnswerEls[i].textContent = "문제 " + (i + 1) + " 정답: " + p.a + " × " + p.b + " = " + p.answer;
+    });
   }
 
   var toastEl = document.getElementById("toast");
@@ -848,6 +986,11 @@
     var filename = "daily-math-" + dateStr + "-answers.png";
     var ok = await saveBlob(canvas, filename);
     if (ok) showToast("정답 이미지를 저장했어요");
+  });
+
+  document.getElementById("print-worksheet").addEventListener("click", function () {
+    renderPrintSheet();
+    window.print();
   });
 
   renderAll();

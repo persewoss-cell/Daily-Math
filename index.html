@@ -438,11 +438,26 @@
     }
     .print-answer {
       flex: 1;
-      text-align: center;
-      font-family: 'JetBrains Mono', 'Space Mono', Consolas, monospace;
-      font-size: 13pt;
-      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
+    .print-answer .pa-label {
+      align-self: flex-start;
+      font-size: 9pt;
+      color: #666;
+      margin-bottom: 2mm;
+    }
+    .print-answer .pa-calc {
+      font-family: 'JetBrains Mono', 'Space Mono', Consolas, monospace;
+      font-weight: 700;
+      font-size: 14pt;
+      line-height: 1.2;
+      width: fit-content;
+    }
+    .print-answer .pa-calc > div { width: 100%; text-align: right; }
+    .print-answer .pa-rule { border-top: 1.5px solid #111; margin: 1mm 0; }
+    .print-answer .pa-sum { font-size: 16pt; }
   }
 </style>
 </head>
@@ -624,9 +639,42 @@
   </div>
   <div class="print-divider"></div>
   <div class="print-answers">
-    <div class="print-answer" data-index="0"></div>
-    <div class="print-answer" data-index="1"></div>
-    <div class="print-answer" data-index="2"></div>
+    <div class="print-answer" data-index="0">
+      <div class="pa-label" data-role="label"></div>
+      <div class="pa-calc">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+        <div class="pa-rule"></div>
+        <div data-role="p1"></div>
+        <div data-role="p2"></div>
+        <div class="pa-rule"></div>
+        <div class="pa-sum" data-role="sum"></div>
+      </div>
+    </div>
+    <div class="print-answer" data-index="1">
+      <div class="pa-label" data-role="label"></div>
+      <div class="pa-calc">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+        <div class="pa-rule"></div>
+        <div data-role="p1"></div>
+        <div data-role="p2"></div>
+        <div class="pa-rule"></div>
+        <div class="pa-sum" data-role="sum"></div>
+      </div>
+    </div>
+    <div class="print-answer" data-index="2">
+      <div class="pa-label" data-role="label"></div>
+      <div class="pa-calc">
+        <div data-role="a"></div>
+        <div>&times; <span data-role="b"></span></div>
+        <div class="pa-rule"></div>
+        <div data-role="p1"></div>
+        <div data-role="p2"></div>
+        <div class="pa-rule"></div>
+        <div class="pa-sum" data-role="sum"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -740,11 +788,23 @@
   var printAnswerEls = document.querySelectorAll(".print-answer");
   function renderPrintSheet() {
     problems.forEach(function (p, i) {
-      var card = printProblemEls[i];
-      card.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " · 난이도 " + p.diff;
-      card.querySelector('[data-role="a"]').textContent = p.a;
-      card.querySelector('[data-role="b"]').textContent = p.b;
-      printAnswerEls[i].textContent = "문제 " + (i + 1) + " 정답: " + p.a + " × " + p.b + " = " + p.answer;
+      var problemCard = printProblemEls[i];
+      problemCard.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " · 난이도 " + p.diff;
+      problemCard.querySelector('[data-role="a"]').textContent = p.a;
+      problemCard.querySelector('[data-role="b"]').textContent = p.b;
+
+      var tens = Math.floor(p.b / 10);
+      var units = p.b % 10;
+      var p1 = p.a * units;
+      var p2 = p.a * tens;
+
+      var answerCard = printAnswerEls[i];
+      answerCard.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " 풀이";
+      answerCard.querySelector('[data-role="a"]').textContent = p.a;
+      answerCard.querySelector('[data-role="b"]').textContent = p.b;
+      answerCard.querySelector('[data-role="p1"]').textContent = p1;
+      answerCard.querySelector('[data-role="p2"]').textContent = p2 + " ";
+      answerCard.querySelector('[data-role="sum"]').textContent = p.answer;
     });
   }
 

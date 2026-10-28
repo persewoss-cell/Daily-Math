@@ -260,12 +260,13 @@
     margin: 0 auto;
   }
   .problem .top-num { padding-right: 2px; }
-  /* 나눗셈 문제는 카드 너비에 맞춰 최대한 크게 (세 자리 수도 카드 안에 들어가도록 26%) */
+  /* 나눗셈 문제는 카드 너비에 맞춰 크게, 위아래로 살짝 여백을 둔다 */
   .board[data-mode="div"] .card { container-type: inline-size; }
   .board[data-mode="div"] .problem {
-    font-size: clamp(3.2rem, 9vw, 6.5rem);
-    font-size: clamp(3rem, 26cqi, 9rem);
+    font-size: clamp(2.6rem, 7vw, 5rem);
+    font-size: clamp(2.6rem, 19cqi, 6.5rem);
     line-height: 1.1;
+    padding: 14px 0;
   }
   .problem .bottom-row {
     display: flex;

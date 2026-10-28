@@ -260,6 +260,13 @@
     margin: 0 auto;
   }
   .problem .top-num { padding-right: 2px; }
+  /* 나눗셈 문제는 카드 너비에 맞춰 최대한 크게 (세 자리 수도 카드 안에 들어가도록 26%) */
+  .board[data-mode="div"] .card { container-type: inline-size; }
+  .board[data-mode="div"] .problem {
+    font-size: clamp(3.2rem, 9vw, 6.5rem);
+    font-size: clamp(3rem, 26cqi, 9rem);
+    line-height: 1.1;
+  }
   .problem .bottom-row {
     display: flex;
     align-items: center;
@@ -941,7 +948,8 @@
     return { n: n, digits: digits, quotient: quotient, rows: rows };
   }
 
-  function buildLongDivision(p, showAnswer) {
+  // withQuotientRow가 false면 몫 자리 빈 줄을 만들지 않는다 (화면 카드용).
+  function buildLongDivision(p, showAnswer, withQuotientRow) {
     var L = longDivisionLayout(p.a, p.b);
     var el = document.createElement("div");
     el.className = "ld";
@@ -956,7 +964,9 @@
       el.appendChild(c);
     }
 
-    for (var col = 0; col < L.n; col++) cell(1, col, showAnswer ? L.quotient[col] : "", "ld-q");
+    if (showAnswer || withQuotientRow !== false) {
+      for (var col = 0; col < L.n; col++) cell(1, col, showAnswer ? L.quotient[col] : "", "ld-q");
+    }
 
     var divisor = document.createElement("span");
     divisor.className = "ld-divisor";
@@ -1127,7 +1137,7 @@
         '<div class="rule"></div>';
     } else {
       problemEl.innerHTML = "";
-      problemEl.appendChild(buildLongDivision(p, false));
+      problemEl.appendChild(buildLongDivision(p, false, false));
     }
     if (p.kind === "mul") {
       var workspace = document.createElement("div");

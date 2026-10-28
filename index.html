@@ -195,6 +195,8 @@
     gap: 20px;
   }
   .board[data-mode="div"] { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+  .board[data-mode="div"] .diff-group { display: flex; width: 100%; }
+  .board[data-mode="div"] .diff-btn { flex: 1; padding: 6px 2px; font-size: 0.8rem; white-space: nowrap; }
 
   .card {
     background: var(--surface);
@@ -225,7 +227,6 @@
     border-radius: 8px;
     overflow: hidden;
   }
-  .diff-group[data-mode="div"] { border: none; }
   .diff-btn {
     border: none;
     background: transparent;
@@ -239,14 +240,6 @@
   .diff-btn:last-child { border-right: none; }
   .diff-btn:hover { background: var(--paper); }
   .diff-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
-  .unit-tag {
-    padding: 5px 10px;
-    border-radius: 8px;
-    background: var(--accent-soft);
-    color: var(--accent-ink);
-    font-size: 0.85rem;
-    font-weight: 700;
-  }
   .diff-btn[aria-pressed="true"][data-diff="하"] { background: var(--green); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="중"] { background: var(--amber); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="상"] { background: var(--red-pen); color: #fff; }
@@ -838,7 +831,7 @@
       tagline: "3학년 2학기 나눗셈 연습",
       groupLabel: "단원 선택",
       levels: DIV_UNITS,
-      fixedLevels: true,
+      // 카드마다 단원 하나씩, 단원 순서대로 기본 선택된다.
       defaults: DIV_UNITS.map(function (u) { return u.key; }),
       seed: dateStr + "#div",
       make: makeDivProblem
@@ -1094,16 +1087,7 @@
     var cfg = MODES[p.kind];
 
     var group = card.querySelector(".diff-group");
-    if (cfg.fixedLevels) {
-      // 나눗셈은 카드마다 단원이 정해져 있어 고르는 버튼 대신 단원 이름만 보여준다.
-      group.setAttribute("data-mode", p.kind);
-      group.removeAttribute("aria-label");
-      group.innerHTML = "";
-      var tag = document.createElement("span");
-      tag.className = "unit-tag";
-      tag.textContent = levelName(p);
-      group.appendChild(tag);
-    } else if (group.getAttribute("data-mode") !== p.kind) {
+    if (group.getAttribute("data-mode") !== p.kind) {
       group.innerHTML = "";
       cfg.levels.forEach(function (level) {
         var btn = document.createElement("button");

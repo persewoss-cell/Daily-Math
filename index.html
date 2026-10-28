@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>매일 수학</title>
-<meta name="description" content="매일 같은 날엔 같은 두 자리 수 곱셈 문제 3개, 난이도별로 문제지와 정답 이미지를 저장할 수 있는 연산 연습 사이트" />
+<meta name="description" content="매일 같은 날엔 같은 곱셈·나눗셈 문제 3개, 두 자리 수 곱셈과 3학년 2학기 나눗셈을 연습하고 문제지와 정답 이미지를 저장할 수 있는 연산 연습 사이트" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Courier+Prime:wght@400;700&display=swap">
 <style>
@@ -136,6 +136,27 @@
     font-size: 0.95rem;
   }
 
+  .mode-tabs {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    background: var(--surface);
+    border: 1px solid var(--surface-border);
+    border-radius: 10px;
+  }
+  .mode-tab {
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 7px 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .mode-tab:hover { color: var(--accent-ink); }
+  .mode-tab[aria-pressed="true"] { background: var(--accent); color: #fff; }
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -215,6 +236,7 @@
   }
   .diff-btn:last-child { border-right: none; }
   .diff-btn:hover { background: var(--paper); }
+  .diff-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="하"] { background: var(--green); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="중"] { background: var(--amber); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="상"] { background: var(--red-pen); color: #fff; }
@@ -244,6 +266,30 @@
     width: 100%;
     border-top: 3px solid var(--ink);
     margin-top: 2px;
+  }
+  .ld {
+    display: grid;
+    width: fit-content;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .ld-cell { text-align: center; }
+  .ld-divisor { grid-row: 2; grid-column: 1; text-align: right; padding-right: 0.08em; }
+  .ld-bracket {
+    grid-row: 2;
+    grid-column: 2 / -1;
+    border-left: 0.08em solid currentColor;
+    border-top: 0.08em solid currentColor;
+    border-top-left-radius: 0.45em 0.6em;
+  }
+  .ld-q { color: var(--red-pen-ink); }
+  .ld-rule { border-top: 2px solid currentColor; margin: 0.12em 0; }
+  .ld-result {
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    color: var(--red-pen-ink);
   }
   .problem .workspace {
     width: 100%;
@@ -347,6 +393,8 @@
     margin: 0 auto;
   }
   .modal-calc > div { width: 100%; text-align: right; }
+  .modal-calc > .ld { width: fit-content; margin: 0 auto; }
+  .modal-calc > .ld-result { text-align: center; }
   .modal-rule { border-top: 2px solid var(--ink); margin: 4px 0; }
   .modal-sum {
     font-size: clamp(1.7rem, 7vw, 2.15rem);
@@ -434,6 +482,11 @@
       border-top: 2px solid #111;
       margin-top: 2mm;
     }
+    .print-problem .ld { margin-left: auto; }
+    .print-sheet .ld-q, .print-sheet .ld-result { color: inherit; }
+    .print-sheet[data-mode="div"] .print-problem { min-height: 78mm; }
+    .print-answer .ld { font-size: 12pt; margin: 0 auto; }
+    .print-answer .ld-result { margin-top: 2mm; font-size: 12pt; text-align: center; }
     .print-divider {
       border-top: 2px dashed #333;
       margin: 8mm 0 6mm;
@@ -482,8 +535,12 @@
       </svg>
       <div>
         <h1>매일 수학</h1>
-        <p class="tagline">두 자리 수 &times; 두 자리 수 곱셈 연습</p>
+        <p class="tagline" id="tagline">두 자리 수 &times; 두 자리 수 곱셈 연습</p>
       </div>
+    </div>
+    <div class="mode-tabs" id="mode-tabs" role="group" aria-label="연산 종류 선택">
+      <button type="button" class="mode-tab" data-mode="mul">곱셈</button>
+      <button type="button" class="mode-tab" data-mode="div">나눗셈</button>
     </div>
     <div class="today">
       <span class="today-label">오늘의 문제</span>
@@ -503,18 +560,9 @@
     <article class="card" data-index="0">
       <div class="card-top">
         <span class="problem-no">문제 1</span>
-        <div class="diff-group" role="group" aria-label="문제 1 난이도 선택">
-          <button type="button" class="diff-btn" data-diff="하">하</button>
-          <button type="button" class="diff-btn" data-diff="중">중</button>
-          <button type="button" class="diff-btn" data-diff="상">상</button>
-        </div>
+        <div class="diff-group" role="group" aria-label="문제 1 난이도 선택"></div>
       </div>
-      <div class="problem">
-        <div class="num top-num" data-role="a">00</div>
-        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
-        <div class="rule"></div>
-        <div class="workspace" aria-hidden="true"></div>
-      </div>
+      <div class="problem"></div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -533,18 +581,9 @@
     <article class="card" data-index="1">
       <div class="card-top">
         <span class="problem-no">문제 2</span>
-        <div class="diff-group" role="group" aria-label="문제 2 난이도 선택">
-          <button type="button" class="diff-btn" data-diff="하">하</button>
-          <button type="button" class="diff-btn" data-diff="중">중</button>
-          <button type="button" class="diff-btn" data-diff="상">상</button>
-        </div>
+        <div class="diff-group" role="group" aria-label="문제 2 난이도 선택"></div>
       </div>
-      <div class="problem">
-        <div class="num top-num" data-role="a">00</div>
-        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
-        <div class="rule"></div>
-        <div class="workspace" aria-hidden="true"></div>
-      </div>
+      <div class="problem"></div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -563,18 +602,9 @@
     <article class="card" data-index="2">
       <div class="card-top">
         <span class="problem-no">문제 3</span>
-        <div class="diff-group" role="group" aria-label="문제 3 난이도 선택">
-          <button type="button" class="diff-btn" data-diff="하">하</button>
-          <button type="button" class="diff-btn" data-diff="중">중</button>
-          <button type="button" class="diff-btn" data-diff="상">상</button>
-        </div>
+        <div class="diff-group" role="group" aria-label="문제 3 난이도 선택"></div>
       </div>
-      <div class="problem">
-        <div class="num top-num" data-role="a">00</div>
-        <div class="num bottom-row"><span class="op">&times;</span><span data-role="b">00</span></div>
-        <div class="rule"></div>
-        <div class="workspace" aria-hidden="true"></div>
-      </div>
+      <div class="problem"></div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -612,7 +642,7 @@
 
 <div class="print-sheet" id="print-sheet" aria-hidden="true">
   <div class="print-header">
-    <div class="print-title">매일 수학 문제지 · <span id="print-date-text"></span></div>
+    <div class="print-title">매일 수학 <span id="print-kind">곱셈</span> 문제지 · <span id="print-date-text"></span></div>
     <div class="print-name-row">
       <span class="print-name-label">이름</span>
       <span class="print-name-line"></span>
@@ -621,66 +651,30 @@
   <div class="print-problems">
     <div class="print-problem" data-index="0">
       <div class="pp-label" data-role="label"></div>
-      <div class="pp-nums">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-      </div>
-      <div class="pp-rule"></div>
+      <div class="pp-nums" data-role="calc"></div>
     </div>
     <div class="print-problem" data-index="1">
       <div class="pp-label" data-role="label"></div>
-      <div class="pp-nums">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-      </div>
-      <div class="pp-rule"></div>
+      <div class="pp-nums" data-role="calc"></div>
     </div>
     <div class="print-problem" data-index="2">
       <div class="pp-label" data-role="label"></div>
-      <div class="pp-nums">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-      </div>
-      <div class="pp-rule"></div>
+      <div class="pp-nums" data-role="calc"></div>
     </div>
   </div>
   <div class="print-divider"></div>
   <div class="print-answers">
     <div class="print-answer" data-index="0">
       <div class="pa-label" data-role="label"></div>
-      <div class="pa-calc">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-        <div class="pa-rule"></div>
-        <div data-role="p1"></div>
-        <div data-role="p2"></div>
-        <div class="pa-rule"></div>
-        <div class="pa-sum" data-role="sum"></div>
-      </div>
+      <div class="pa-calc" data-role="calc"></div>
     </div>
     <div class="print-answer" data-index="1">
       <div class="pa-label" data-role="label"></div>
-      <div class="pa-calc">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-        <div class="pa-rule"></div>
-        <div data-role="p1"></div>
-        <div data-role="p2"></div>
-        <div class="pa-rule"></div>
-        <div class="pa-sum" data-role="sum"></div>
-      </div>
+      <div class="pa-calc" data-role="calc"></div>
     </div>
     <div class="print-answer" data-index="2">
       <div class="pa-label" data-role="label"></div>
-      <div class="pa-calc">
-        <div data-role="a"></div>
-        <div>&times; <span data-role="b"></span></div>
-        <div class="pa-rule"></div>
-        <div data-role="p1"></div>
-        <div data-role="p2"></div>
-        <div class="pa-rule"></div>
-        <div class="pa-sum" data-role="sum"></div>
-      </div>
+      <div class="pa-calc" data-role="calc"></div>
     </div>
   </div>
 </div>
@@ -691,15 +685,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="6" y1="18" x2="18" y2="6"></line></svg>
     </button>
     <p class="modal-eyebrow" id="answer-modal-meta"></p>
-    <div class="modal-calc" id="answer-modal-calc">
-      <div data-role="a"></div>
-      <div>&times; <span data-role="b"></span></div>
-      <div class="modal-rule"></div>
-      <div data-role="p1"></div>
-      <div data-role="p2"></div>
-      <div class="modal-rule"></div>
-      <div class="modal-sum" data-role="sum"></div>
-    </div>
+    <div class="modal-calc" id="answer-modal-calc"></div>
   </div>
 </div>
 
@@ -714,7 +700,13 @@
     "중": { tens: [3, 5], units: [3, 9] },
     "상": { tens: [6, 9], units: [3, 9] }
   };
-  var DEFAULT_DIFFS = ["하", "중", "상"];
+
+  var DIV_UNITS = [
+    { key: "몇십", label: "몇십", name: "(몇십)÷(몇)" },
+    { key: "몇십몇", label: "몇십몇", name: "(몇십몇)÷(몇)" },
+    { key: "나머지", label: "나머지", name: "나머지가 있는 나눗셈" },
+    { key: "세자리", label: "세 자리", name: "(세 자리 수)÷(한 자리 수)" }
+  ];
 
   function mulberry32(seed) {
     return function () {
@@ -750,23 +742,309 @@
     return tens * 10 + units;
   }
 
-  function makeProblem(diff, rng) {
+  function makeMulProblem(diff, rng) {
     var digits = DIFF_DIGITS[diff];
     var a = randDigitNumber(rng, digits);
     var b = randDigitNumber(rng, digits);
-    return { a: a, b: b, diff: diff, answer: a * b };
+    return { kind: "mul", a: a, b: b, diff: diff, answer: a * b };
+  }
+
+  // 단원별로 가능한 [나뉠 수, 나누는 수] 조합을 모두 만들어 두고 그중에서 고른다.
+  // 몇십 · 몇십몇 · 세 자리는 자리마다 나누어떨어지는(내림 없는) 수만, 나머지는 몫이 한 자리인 수만 쓴다.
+  // 몇십몇 · 세 자리에서 5 이상으로 나누면 55÷5=11처럼 몫이 1로만 이루어져 너무 쉬우므로 2~4로만 나눈다.
+  function buildDivPools() {
+    var pools = { "몇십": [], "몇십몇": [], "나머지": [], "세자리": [] };
+    for (var d = 2; d <= 9; d++) {
+      var multiples = [];
+      for (var m = d; m <= 9; m += d) multiples.push(m);
+      multiples.forEach(function (t) {
+        pools["몇십"].push([t * 10, d]);
+        if (d > 4) return;
+        multiples.forEach(function (u) {
+          pools["몇십몇"].push([t * 10 + u, d]);
+          multiples.forEach(function (v) {
+            pools["세자리"].push([t * 100 + u * 10 + v, d]);
+          });
+        });
+      });
+      for (var a = 10; a < d * 10; a++) {
+        if (a % d !== 0) pools["나머지"].push([a, d]);
+      }
+    }
+    return pools;
+  }
+  var DIV_POOLS = buildDivPools();
+
+  function makeDivProblem(unit, rng) {
+    var pool = DIV_POOLS[unit];
+    var pick = pool[Math.floor(rng() * pool.length)];
+    var a = pick[0], b = pick[1];
+    return { kind: "div", a: a, b: b, diff: unit, answer: Math.floor(a / b), remainder: a % b };
+  }
+
+  // 날짜마다 단원 하나를 쉬게 해서 4개 단원이 돌아가며 나온다.
+  function defaultDivUnits() {
+    var d = new Date();
+    var dayNumber = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
+    var skip = dayNumber % DIV_UNITS.length;
+    return DIV_UNITS.filter(function (u, i) { return i !== skip; }).map(function (u) { return u.key; });
   }
 
   var dateStr = todayKey();
-  var dailyRng = mulberry32(hashString(dateStr));
-  var problems = DEFAULT_DIFFS.map(function (diff) {
-    return makeProblem(diff, dailyRng);
+
+  var MODES = {
+    mul: {
+      name: "곱셈",
+      tagline: "두 자리 수 × 두 자리 수 곱셈 연습",
+      groupLabel: "난이도 선택",
+      levels: [{ key: "하", label: "하" }, { key: "중", label: "중" }, { key: "상", label: "상" }],
+      defaults: ["하", "중", "상"],
+      seed: dateStr,
+      make: makeMulProblem
+    },
+    div: {
+      name: "나눗셈",
+      tagline: "3학년 2학기 나눗셈 연습",
+      groupLabel: "단원 선택",
+      levels: DIV_UNITS,
+      defaults: defaultDivUnits(),
+      seed: dateStr + "#div",
+      make: makeDivProblem
+    }
+  };
+
+  function levelName(p) {
+    if (p.kind === "mul") return "난이도 " + p.diff;
+    return DIV_UNITS.filter(function (u) { return u.key === p.diff; })[0].name;
+  }
+
+  function resultText(p) {
+    if (p.kind === "mul") return p.a + " × " + p.b + " = " + p.answer;
+    return p.a + " ÷ " + p.b + " = " + p.answer + (p.remainder ? " … " + p.remainder : "");
+  }
+
+  function spokenText(p) {
+    if (p.kind === "mul") return p.a + " 곱하기 " + p.b;
+    return p.a + " 나누기 " + p.b;
+  }
+
+  var states = {};
+  Object.keys(MODES).forEach(function (m) {
+    var cfg = MODES[m];
+    var rng = mulberry32(hashString(cfg.seed));
+    var list = cfg.defaults.map(function (diff) { return cfg.make(diff, rng); });
+    states[m] = { problems: list, history: list.map(function () { return []; }) };
   });
-  var history = problems.map(function () { return []; });
+
+  var MODE_KEY = "daily-math-mode";
+  function loadMode() {
+    try {
+      var saved = localStorage.getItem(MODE_KEY);
+      if (saved && MODES[saved]) return saved;
+    } catch (err) {}
+    return "mul";
+  }
+  function saveMode(m) {
+    try { localStorage.setItem(MODE_KEY, m); } catch (err) {}
+  }
+
+  var mode, problems, history;
+  function useMode(m) {
+    mode = m;
+    problems = states[m].problems;
+    history = states[m].history;
+  }
+  useMode(loadMode());
 
   function replaceProblem(index, diff, rng) {
     history[index].push(problems[index]);
-    problems[index] = makeProblem(diff, rng);
+    problems[index] = MODES[mode].make(diff, rng);
+  }
+
+  // 세로식 나눗셈 풀이 배치. 열은 나뉠 수의 자리(0 = 맨 앞)이고,
+  // rows는 나뉠 수 아래에 차례로 쓰는 줄(수 또는 가로선)이다.
+  function longDivisionLayout(a, d) {
+    var digits = String(a).split("").map(Number);
+    var n = digits.length;
+    var quotient = digits.map(function () { return ""; });
+    var rows = [];
+
+    function numRow(value, endCol) {
+      var s = String(value);
+      var cells = [];
+      for (var k = 0; k < s.length; k++) cells.push({ col: endCol - s.length + 1 + k, ch: s[k] });
+      rows.push({ type: "num", cells: cells });
+    }
+
+    var r = 0, started = false;
+    for (var i = 0; i < n; i++) {
+      var cur = r * 10 + digits[i];
+      if (!started && cur < d && i < n - 1) { r = cur; continue; }
+      var startCol = i - String(cur).length + 1;
+      if (started) numRow(cur, i);
+      started = true;
+
+      var q = Math.floor(cur / d);
+      var prod = q * d;
+      quotient[i] = String(q);
+      r = cur - prod;
+
+      // 60÷3처럼 남은 자리가 모두 0이면 교과서처럼 60을 한 줄에 쓰고 끝낸다.
+      var restZero = digits.slice(i + 1).every(function (x) { return x === 0; });
+      if (r === 0 && restZero && i < n - 1) {
+        for (var k = i + 1; k < n; k++) quotient[k] = "0";
+        numRow(prod * Math.pow(10, n - 1 - i), n - 1);
+        rows.push({ type: "rule", from: startCol, to: n - 1 });
+        numRow(0, n - 1);
+        break;
+      }
+
+      numRow(prod, i);
+      rows.push({ type: "rule", from: startCol, to: n - 1 });
+      if (i === n - 1) numRow(r, n - 1);
+    }
+    return { n: n, digits: digits, quotient: quotient, rows: rows };
+  }
+
+  function buildLongDivision(p, showAnswer) {
+    var L = longDivisionLayout(p.a, p.b);
+    var el = document.createElement("div");
+    el.className = "ld";
+    el.style.gridTemplateColumns = "auto 0.32em repeat(" + L.n + ", 0.72em)";
+
+    function cell(row, col, text, cls) {
+      var c = document.createElement("span");
+      c.className = "ld-cell" + (cls ? " " + cls : "");
+      c.style.gridRow = row;
+      c.style.gridColumn = col + 3;
+      c.textContent = text || " ";
+      el.appendChild(c);
+    }
+
+    for (var col = 0; col < L.n; col++) cell(1, col, showAnswer ? L.quotient[col] : "", "ld-q");
+
+    var divisor = document.createElement("span");
+    divisor.className = "ld-divisor";
+    divisor.textContent = p.b;
+    el.appendChild(divisor);
+    var bracket = document.createElement("span");
+    bracket.className = "ld-bracket";
+    el.appendChild(bracket);
+    L.digits.forEach(function (digit, c) { cell(2, c, String(digit)); });
+
+    if (showAnswer) {
+      L.rows.forEach(function (row, idx) {
+        var gridRow = idx + 3;
+        if (row.type === "num") {
+          row.cells.forEach(function (rc) { cell(gridRow, rc.col, rc.ch); });
+        } else {
+          var rule = document.createElement("span");
+          rule.className = "ld-rule";
+          rule.style.gridRow = gridRow;
+          rule.style.gridColumn = (row.from + 3) + " / " + (row.to + 4);
+          el.appendChild(rule);
+        }
+      });
+    }
+    return el;
+  }
+
+  function longDivisionHeight(p, fontPx, showAnswer) {
+    var rowH = fontPx * 1.2, ruleH = fontPx * 0.3;
+    var h = rowH * 2;
+    if (showAnswer) {
+      longDivisionLayout(p.a, p.b).rows.forEach(function (row) {
+        h += row.type === "num" ? rowH : ruleH;
+      });
+    }
+    return h;
+  }
+
+  // 화면의 .ld 격자와 같은 배치로 캔버스에 그린다. 그린 영역의 아래쪽 y를 돌려준다.
+  function drawLongDivision(ctx, p, centerX, top, fontPx, showAnswer, inkColor, answerColor) {
+    var L = longDivisionLayout(p.a, p.b);
+    var cellW = fontPx * 0.72, gapW = fontPx * 0.32, rowH = fontPx * 1.2, ruleH = fontPx * 0.3;
+    ctx.font = "bold " + fontPx + "px 'Courier Prime', monospace";
+    var divisorW = ctx.measureText(String(p.b)).width + fontPx * 0.18;
+    var totalW = divisorW + gapW + L.n * cellW;
+    var digitsLeft = centerX - totalW / 2 + divisorW + gapW;
+    var bracketX = digitsLeft - gapW;
+
+    function colX(c) { return digitsLeft + cellW * (c + 0.5); }
+
+    ctx.textBaseline = "alphabetic";
+    ctx.textAlign = "center";
+    var y = top;
+    if (showAnswer) {
+      ctx.fillStyle = answerColor;
+      L.quotient.forEach(function (ch, c) { if (ch) ctx.fillText(ch, colX(c), y + fontPx); });
+    }
+    y += rowH;
+
+    ctx.fillStyle = inkColor;
+    ctx.strokeStyle = inkColor;
+    ctx.textAlign = "right";
+    ctx.fillText(String(p.b), bracketX - fontPx * 0.18, y + fontPx);
+    ctx.textAlign = "center";
+    L.digits.forEach(function (digit, c) { ctx.fillText(String(digit), colX(c), y + fontPx); });
+
+    var lw = Math.max(2, fontPx * 0.08);
+    ctx.lineWidth = lw;
+    ctx.beginPath();
+    ctx.moveTo(bracketX, y + rowH);
+    ctx.lineTo(bracketX, y + fontPx * 0.6);
+    ctx.quadraticCurveTo(bracketX, y, bracketX + fontPx * 0.45, y);
+    ctx.lineTo(digitsLeft + L.n * cellW, y);
+    ctx.stroke();
+    y += rowH;
+
+    if (showAnswer) {
+      ctx.lineWidth = 2;
+      L.rows.forEach(function (row) {
+        if (row.type === "num") {
+          row.cells.forEach(function (rc) { ctx.fillText(rc.ch, colX(rc.col), y + fontPx); });
+          y += rowH;
+        } else {
+          ctx.beginPath();
+          ctx.moveTo(digitsLeft + cellW * row.from, y + ruleH / 2);
+          ctx.lineTo(digitsLeft + cellW * (row.to + 1), y + ruleH / 2);
+          ctx.stroke();
+          y += ruleH;
+        }
+      });
+    }
+    ctx.textAlign = "left";
+    return y;
+  }
+
+  function mulParts(p) {
+    return { p1: p.a * (p.b % 10), p2: p.a * Math.floor(p.b / 10) };
+  }
+
+  function mulAnswerHTML(p, prefix) {
+    var parts = mulParts(p);
+    return (
+      "<div>" + p.a + "</div>" +
+      "<div>&times; " + p.b + "</div>" +
+      '<div class="' + prefix + '-rule"></div>' +
+      "<div>" + parts.p1 + "</div>" +
+      "<div>" + parts.p2 + "&nbsp;</div>" +
+      '<div class="' + prefix + '-rule"></div>' +
+      '<div class="' + prefix + '-sum">' + p.answer + "</div>"
+    );
+  }
+
+  function fillAnswer(container, p, prefix) {
+    container.innerHTML = "";
+    if (p.kind === "mul") {
+      container.innerHTML = mulAnswerHTML(p, prefix);
+      return;
+    }
+    container.appendChild(buildLongDivision(p, true));
+    var result = document.createElement("div");
+    result.className = "ld-result";
+    result.textContent = resultText(p);
+    container.appendChild(result);
   }
 
   var board = document.getElementById("board");
@@ -781,17 +1059,44 @@
   function renderCard(index) {
     var card = cards[index];
     var p = problems[index];
-    card.querySelector('[data-role="a"]').textContent = p.a;
-    card.querySelector('[data-role="b"]').textContent = p.b;
-    var buttons = card.querySelectorAll(".diff-btn");
-    buttons.forEach(function (btn) {
+    var cfg = MODES[p.kind];
+
+    var group = card.querySelector(".diff-group");
+    if (group.getAttribute("data-mode") !== p.kind) {
+      group.innerHTML = "";
+      cfg.levels.forEach(function (level) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "diff-btn";
+        btn.setAttribute("data-diff", level.key);
+        if (level.name) btn.title = level.name;
+        btn.textContent = level.label;
+        group.appendChild(btn);
+      });
+      group.setAttribute("data-mode", p.kind);
+      group.setAttribute("aria-label", "문제 " + (index + 1) + " " + cfg.groupLabel);
+    }
+    group.querySelectorAll(".diff-btn").forEach(function (btn) {
       var isActive = btn.getAttribute("data-diff") === p.diff;
       btn.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
-    card.querySelector(".problem").setAttribute(
-      "aria-label",
-      p.a + " 곱하기 " + p.b + ", 난이도 " + p.diff
-    );
+
+    var problemEl = card.querySelector(".problem");
+    if (p.kind === "mul") {
+      problemEl.innerHTML =
+        '<div class="num top-num">' + p.a + "</div>" +
+        '<div class="num bottom-row"><span class="op">&times;</span><span>' + p.b + "</span></div>" +
+        '<div class="rule"></div>';
+    } else {
+      problemEl.innerHTML = "";
+      problemEl.appendChild(buildLongDivision(p, false));
+    }
+    var workspace = document.createElement("div");
+    workspace.className = "workspace";
+    workspace.setAttribute("aria-hidden", "true");
+    problemEl.appendChild(workspace);
+    problemEl.setAttribute("aria-label", spokenText(p) + ", " + levelName(p));
+
     card.querySelector('[data-action="undo"]').disabled = history[index].length === 0;
   }
 
@@ -799,27 +1104,45 @@
     for (var i = 0; i < problems.length; i++) renderCard(i);
   }
 
+  var tagline = document.getElementById("tagline");
+  var modeTabs = Array.prototype.slice.call(document.querySelectorAll(".mode-tab"));
+  function renderMode() {
+    modeTabs.forEach(function (tab) {
+      tab.setAttribute("aria-pressed", tab.getAttribute("data-mode") === mode ? "true" : "false");
+    });
+    tagline.textContent = MODES[mode].tagline;
+    document.getElementById("print-kind").textContent = MODES[mode].name;
+    renderAll();
+  }
+
+  document.getElementById("mode-tabs").addEventListener("click", function (e) {
+    var tab = e.target.closest(".mode-tab");
+    if (!tab) return;
+    var next = tab.getAttribute("data-mode");
+    if (next === mode) return;
+    useMode(next);
+    saveMode(next);
+    renderMode();
+  });
+
   var printProblemEls = document.querySelectorAll(".print-problem");
   var printAnswerEls = document.querySelectorAll(".print-answer");
   function renderPrintSheet() {
+    document.getElementById("print-sheet").setAttribute("data-mode", mode);
     problems.forEach(function (p, i) {
       var problemCard = printProblemEls[i];
-      problemCard.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " · 난이도 " + p.diff;
-      problemCard.querySelector('[data-role="a"]').textContent = p.a;
-      problemCard.querySelector('[data-role="b"]').textContent = p.b;
-
-      var tens = Math.floor(p.b / 10);
-      var units = p.b % 10;
-      var p1 = p.a * units;
-      var p2 = p.a * tens;
+      problemCard.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " · " + levelName(p);
+      var problemCalc = problemCard.querySelector('[data-role="calc"]');
+      if (p.kind === "mul") {
+        problemCalc.innerHTML = "<div>" + p.a + "</div><div>&times; " + p.b + '</div><div class="pp-rule"></div>';
+      } else {
+        problemCalc.innerHTML = "";
+        problemCalc.appendChild(buildLongDivision(p, false));
+      }
 
       var answerCard = printAnswerEls[i];
       answerCard.querySelector('[data-role="label"]').textContent = "문제 " + (i + 1) + " 풀이";
-      answerCard.querySelector('[data-role="a"]').textContent = p.a;
-      answerCard.querySelector('[data-role="b"]').textContent = p.b;
-      answerCard.querySelector('[data-role="p1"]').textContent = p1;
-      answerCard.querySelector('[data-role="p2"]').textContent = p2 + " ";
-      answerCard.querySelector('[data-role="sum"]').textContent = p.answer;
+      fillAnswer(answerCard.querySelector('[data-role="calc"]'), p, "pa");
     });
   }
 
@@ -841,18 +1164,10 @@
 
   function openAnswerModal(index) {
     var p = problems[index];
-    var tens = Math.floor(p.b / 10);
-    var units = p.b % 10;
-    var p1 = p.a * units;
-    var p2 = p.a * tens;
-
-    answerModalMeta.textContent = "문제 " + (index + 1) + " · 난이도 " + p.diff;
-    answerModalCalc.querySelector('[data-role="a"]').textContent = p.a;
-    answerModalCalc.querySelector('[data-role="b"]').textContent = p.b;
-    answerModalCalc.querySelector('[data-role="p1"]').textContent = p1;
-    answerModalCalc.querySelector('[data-role="p2"]').textContent = p2 + " ";
-    answerModalCalc.querySelector('[data-role="sum"]').textContent = p.answer;
-    answerModalCalc.setAttribute("aria-label", p.a + " 곱하기 " + p.b + "는 " + p.answer + "입니다");
+    answerModalMeta.textContent = "문제 " + (index + 1) + " · " + levelName(p);
+    fillAnswer(answerModalCalc, p, "modal");
+    var spokenAnswer = p.kind === "div" && p.remainder ? "몫은 " + p.answer + ", 나머지는 " + p.remainder : p.answer;
+    answerModalCalc.setAttribute("aria-label", spokenText(p) + "는 " + spokenAnswer + "입니다");
     answerModal.hidden = false;
     answerModalClose.focus();
   }
@@ -897,7 +1212,7 @@
     ctx.font = "bold 16px 'Gowun Dodum', sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
-    ctx.fillText("매일 수학 · " + dateStr + " 문제", padding, 26);
+    ctx.fillText("매일 수학 · " + dateStr + " " + MODES[mode].name + " 문제", padding, 26);
 
     problems.forEach(function (p, i) {
       var x = padding + i * (cardW + gap);
@@ -913,24 +1228,31 @@
       ctx.fillStyle = "#55608a";
       ctx.font = "13px 'Gowun Dodum', sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("문제 " + (i + 1) + " · 난이도 " + p.diff, x + 18, top + 26);
+      ctx.fillText("문제 " + (i + 1) + " · " + levelName(p), x + 18, top + 26);
 
-      ctx.fillStyle = "#1d2440";
-      ctx.font = "bold 34px 'Courier Prime', monospace";
-      ctx.textAlign = "right";
-      ctx.fillText(String(p.a), right, top + 66);
-      ctx.fillText("× " + p.b, right, top + 106);
+      var linesFrom;
+      if (p.kind === "mul") {
+        ctx.fillStyle = "#1d2440";
+        ctx.font = "bold 34px 'Courier Prime', monospace";
+        ctx.textAlign = "right";
+        ctx.fillText(String(p.a), right, top + 66);
+        ctx.fillText("× " + p.b, right, top + 106);
 
-      ctx.strokeStyle = "#1d2440";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x + 18, top + 118);
-      ctx.lineTo(right, top + 118);
-      ctx.stroke();
+        ctx.strokeStyle = "#1d2440";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x + 18, top + 118);
+        ctx.lineTo(right, top + 118);
+        ctx.stroke();
+        linesFrom = top + 142;
+      } else {
+        var bottom = drawLongDivision(ctx, p, x + cardW / 2, top + 36, 34, false, "#1d2440", "#d6483c");
+        linesFrom = bottom + 24;
+      }
 
       ctx.strokeStyle = "#d7def2";
       ctx.lineWidth = 1;
-      for (var ly = top + 142; ly < top + cardH - 14; ly += 24) {
+      for (var ly = linesFrom; ly < top + cardH - 14; ly += 24) {
         ctx.beginPath();
         ctx.moveTo(x + 18, ly);
         ctx.lineTo(right, ly);
@@ -945,6 +1267,10 @@
   function drawAllAnswersImage() {
     var scale = 2;
     var cardW = 260, gap = 18, padding = 20, top = 42, cardH = 245;
+    var ldFont = 22;
+    problems.forEach(function (p) {
+      if (p.kind === "div") cardH = Math.max(cardH, 40 + longDivisionHeight(p, ldFont, true) + 48);
+    });
     var w = padding * 2 + cardW * problems.length + gap * (problems.length - 1);
     var h = top + cardH + padding;
     var canvas = document.createElement("canvas");
@@ -960,7 +1286,7 @@
     ctx.font = "bold 16px 'Gowun Dodum', sans-serif";
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
-    ctx.fillText("매일 수학 · " + dateStr + " 풀이", padding, 26);
+    ctx.fillText("매일 수학 · " + dateStr + " " + MODES[mode].name + " 풀이", padding, 26);
 
     problems.forEach(function (p, i) {
       var x = padding + i * (cardW + gap);
@@ -976,12 +1302,19 @@
       ctx.fillStyle = "#55608a";
       ctx.font = "13px 'Gowun Dodum', sans-serif";
       ctx.textAlign = "left";
-      ctx.fillText("문제 " + (i + 1) + " · 난이도 " + p.diff, x + 18, top + 24);
+      ctx.fillText("문제 " + (i + 1) + " · " + levelName(p), x + 18, top + 24);
 
-      var tens = Math.floor(p.b / 10);
-      var units = p.b % 10;
-      var p1 = p.a * units;
-      var p2 = p.a * tens;
+      if (p.kind === "div") {
+        var bottom = drawLongDivision(ctx, p, x + cardW / 2, top + 40, ldFont, true, "#1d2440", "#d6483c");
+        ctx.fillStyle = "#d6483c";
+        ctx.font = "bold 20px 'Courier Prime', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(resultText(p), x + cardW / 2, bottom + 30);
+        ctx.textAlign = "left";
+        return;
+      }
+
+      var parts = mulParts(p);
 
       ctx.fillStyle = "#1d2440";
       ctx.font = "bold 26px 'Courier Prime', monospace";
@@ -1002,9 +1335,9 @@
       ctx.font = "20px 'Courier Prime', monospace";
       var charWidth = ctx.measureText("0").width;
       y += 28;
-      ctx.fillText(String(p1), right, y);
+      ctx.fillText(String(parts.p1), right, y);
       y += 26;
-      ctx.fillText(String(p2), right - charWidth, y);
+      ctx.fillText(String(parts.p2), right - charWidth, y);
 
       y += 8;
       ctx.beginPath();
@@ -1097,20 +1430,22 @@
       replaceProblem(i, problems[i].diff, Math.random);
     }
     renderAll();
-    showToast("문제 3개를 새로 냈어요");
+    showToast(MODES[mode].name + " 문제 3개를 새로 냈어요");
   });
+
+  function fileBase() {
+    return "daily-math-" + dateStr + (mode === "div" ? "-division" : "");
+  }
 
   document.getElementById("save-all-problems").addEventListener("click", async function () {
     var canvas = drawAllProblemsImage();
-    var filename = "daily-math-" + dateStr + "-problems.png";
-    var ok = await saveBlob(canvas, filename);
+    var ok = await saveBlob(canvas, fileBase() + "-problems.png");
     if (ok) showToast("문제 이미지를 저장했어요");
   });
 
   document.getElementById("save-all-answers").addEventListener("click", async function () {
     var canvas = drawAllAnswersImage();
-    var filename = "daily-math-" + dateStr + "-answers.png";
-    var ok = await saveBlob(canvas, filename);
+    var ok = await saveBlob(canvas, fileBase() + "-answers.png");
     if (ok) showToast("정답 이미지를 저장했어요");
   });
 
@@ -1119,7 +1454,7 @@
     window.print();
   });
 
-  renderAll();
+  renderMode();
 })();
 </script>
 </body>

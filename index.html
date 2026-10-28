@@ -198,7 +198,7 @@
   @media (max-width: 560px) {
     .board[data-mode="div"] { grid-template-columns: 1fr; }
   }
-  .board[data-mode="div"] .diff-group { display: flex; width: 100%; }
+  .board[data-mode="div"] .diff-group { display: flex; flex: 1 1 240px; }
   .board[data-mode="div"] .diff-btn { flex: 1; padding: 6px 2px; font-size: 0.8rem; white-space: nowrap; }
 
   .card {
@@ -266,7 +266,14 @@
     font-size: clamp(2.6rem, 7vw, 5rem);
     font-size: clamp(2.6rem, 19cqi, 6.5rem);
     line-height: 1.1;
-    padding: 14px 0;
+    padding: 8px 0;
+  }
+  /* 두 줄 배치일 때는 머리말 · 카드 두 줄 · 인쇄 버튼까지 한 화면에 들어가도록 창 높이에 맞춰 줄인다 */
+  @media (min-width: 561px) {
+    .board[data-mode="div"] .card { padding: 12px 16px; gap: 8px; }
+    .board[data-mode="div"] .problem {
+      font-size: clamp(2rem, min(19cqi, (100vh - 490px) / 2.7), 6.5rem);
+    }
   }
   .problem .bottom-row {
     display: flex;

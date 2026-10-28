@@ -194,7 +194,10 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
-  .board[data-mode="div"] { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
+  .board[data-mode="div"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (max-width: 560px) {
+    .board[data-mode="div"] { grid-template-columns: 1fr; }
+  }
   .board[data-mode="div"] .diff-group { display: flex; width: 100%; }
   .board[data-mode="div"] .diff-btn { flex: 1; padding: 6px 2px; font-size: 0.8rem; white-space: nowrap; }
 
@@ -282,9 +285,16 @@
   .ld-bracket {
     grid-row: 2;
     grid-column: 2 / -1;
-    border-left: 0.08em solid currentColor;
+    position: relative;
     border-top: 0.08em solid currentColor;
-    border-top-left-radius: 0.45em 0.6em;
+  }
+  .ld-bracket svg {
+    position: absolute;
+    left: 0;
+    top: -0.08em;
+    width: 0.42em;
+    height: calc(100% + 0.08em);
+    overflow: visible;
   }
   .ld-q { color: var(--red-pen-ink); }
   .ld-rule { border-top: 2px solid currentColor; margin: 0.12em 0; }
@@ -935,7 +945,7 @@
     var L = longDivisionLayout(p.a, p.b);
     var el = document.createElement("div");
     el.className = "ld";
-    el.style.gridTemplateColumns = "auto 0.32em repeat(" + L.n + ", 0.72em)";
+    el.style.gridTemplateColumns = "auto 0.42em repeat(" + L.n + ", 0.72em)";
 
     function cell(row, col, text, cls) {
       var c = document.createElement("span");
@@ -954,6 +964,10 @@
     el.appendChild(divisor);
     var bracket = document.createElement("span");
     bracket.className = "ld-bracket";
+    // 나누는 수 오른쪽의 ")" 모양 곡선. 위쪽 끝이 나뉠 수 위의 가로선과 이어진다.
+    bracket.innerHTML =
+      '<svg viewBox="0 0 42 120" preserveAspectRatio="none" aria-hidden="true">' +
+      '<path d="M3 4 Q45 62 3 120" fill="none" stroke="currentColor" stroke-width="8"></path></svg>';
     el.appendChild(bracket);
     L.digits.forEach(function (digit, c) { cell(2, c, String(digit)); });
 
@@ -988,7 +1002,7 @@
   // 화면의 .ld 격자와 같은 배치로 캔버스에 그린다. 그린 영역의 아래쪽 y를 돌려준다.
   function drawLongDivision(ctx, p, centerX, top, fontPx, showAnswer, inkColor, answerColor) {
     var L = longDivisionLayout(p.a, p.b);
-    var cellW = fontPx * 0.72, gapW = fontPx * 0.32, rowH = fontPx * 1.2, ruleH = fontPx * 0.3;
+    var cellW = fontPx * 0.72, gapW = fontPx * 0.42, rowH = fontPx * 1.2, ruleH = fontPx * 0.3;
     ctx.font = "bold " + fontPx + "px 'Courier Prime', monospace";
     var divisorW = ctx.measureText(String(p.b)).width + fontPx * 0.18;
     var totalW = divisorW + gapW + L.n * cellW;
@@ -1017,8 +1031,7 @@
     ctx.lineWidth = lw;
     ctx.beginPath();
     ctx.moveTo(bracketX, y + rowH);
-    ctx.lineTo(bracketX, y + fontPx * 0.6);
-    ctx.quadraticCurveTo(bracketX, y, bracketX + fontPx * 0.45, y);
+    ctx.quadraticCurveTo(bracketX + fontPx * 0.42, y + rowH / 2, bracketX, y);
     ctx.lineTo(digitsLeft + L.n * cellW, y);
     ctx.stroke();
     y += rowH;
@@ -1116,10 +1129,12 @@
       problemEl.innerHTML = "";
       problemEl.appendChild(buildLongDivision(p, false));
     }
-    var workspace = document.createElement("div");
-    workspace.className = "workspace";
-    workspace.setAttribute("aria-hidden", "true");
-    problemEl.appendChild(workspace);
+    if (p.kind === "mul") {
+      var workspace = document.createElement("div");
+      workspace.className = "workspace";
+      workspace.setAttribute("aria-hidden", "true");
+      problemEl.appendChild(workspace);
+    }
     problemEl.setAttribute("aria-label", spokenText(p) + ", " + levelName(p));
 
     card.querySelector('[data-action="undo"]').disabled = history[index].length === 0;
@@ -1260,29 +1275,27 @@
       ctx.textAlign = "left";
       ctx.fillText("문제 " + (i + 1) + " · " + levelName(p), x + 18, top + 26);
 
-      var linesFrom;
-      if (p.kind === "mul") {
-        ctx.fillStyle = "#1d2440";
-        ctx.font = "bold 34px 'Courier Prime', monospace";
-        ctx.textAlign = "right";
-        ctx.fillText(String(p.a), right, top + 66);
-        ctx.fillText("× " + p.b, right, top + 106);
-
-        ctx.strokeStyle = "#1d2440";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x + 18, top + 118);
-        ctx.lineTo(right, top + 118);
-        ctx.stroke();
-        linesFrom = top + 142;
-      } else {
-        var bottom = drawLongDivision(ctx, p, x + cardW / 2, top + 36, 34, false, "#1d2440", "#d6483c");
-        linesFrom = bottom + 24;
+      if (p.kind === "div") {
+        drawLongDivision(ctx, p, x + cardW / 2, top + 36, 34, false, "#1d2440", "#d6483c");
+        return;
       }
+
+      ctx.fillStyle = "#1d2440";
+      ctx.font = "bold 34px 'Courier Prime', monospace";
+      ctx.textAlign = "right";
+      ctx.fillText(String(p.a), right, top + 66);
+      ctx.fillText("× " + p.b, right, top + 106);
+
+      ctx.strokeStyle = "#1d2440";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x + 18, top + 118);
+      ctx.lineTo(right, top + 118);
+      ctx.stroke();
 
       ctx.strokeStyle = "#d7def2";
       ctx.lineWidth = 1;
-      for (var ly = linesFrom; ly < top + cardH - 14; ly += 24) {
+      for (var ly = top + 142; ly < top + cardH - 14; ly += 24) {
         ctx.beginPath();
         ctx.moveTo(x + 18, ly);
         ctx.lineTo(right, ly);

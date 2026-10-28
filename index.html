@@ -194,6 +194,7 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
   }
+  .board[data-mode="div"] { grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; }
 
   .card {
     background: var(--surface);
@@ -224,6 +225,7 @@
     border-radius: 8px;
     overflow: hidden;
   }
+  .diff-group[data-mode="div"] { border: none; }
   .diff-btn {
     border: none;
     background: transparent;
@@ -237,6 +239,14 @@
   .diff-btn:last-child { border-right: none; }
   .diff-btn:hover { background: var(--paper); }
   .diff-btn[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .unit-tag {
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
   .diff-btn[aria-pressed="true"][data-diff="하"] { background: var(--green); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="중"] { background: var(--amber); color: #fff; }
   .diff-btn[aria-pressed="true"][data-diff="상"] { background: var(--red-pen); color: #fff; }
@@ -619,6 +629,27 @@
         </button>
       </div>
     </article>
+
+    <article class="card" data-index="3">
+      <div class="card-top">
+        <span class="problem-no">문제 4</span>
+        <div class="diff-group" role="group" aria-label="문제 4 난이도 선택"></div>
+      </div>
+      <div class="problem"></div>
+      <div class="card-actions">
+        <button type="button" class="btn btn-shuffle" data-action="shuffle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          다른 문제
+        </button>
+        <button type="button" class="btn btn-undo" data-action="undo" title="되돌리기" aria-label="이전 문제로 되돌리기" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
+        </button>
+        <button type="button" class="btn btn-check" data-action="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15.5V19a1 1 0 0 0 1 1h3.5L19 9.5a2.12 2.12 0 0 0-3-3L5.5 17"></path><line x1="14" y1="7" x2="17" y2="10"></line></svg>
+          정답 확인
+        </button>
+      </div>
+    </article>
   </main>
 
   <footer class="footer-bar">
@@ -661,6 +692,10 @@
       <div class="pp-label" data-role="label"></div>
       <div class="pp-nums" data-role="calc"></div>
     </div>
+    <div class="print-problem" data-index="3">
+      <div class="pp-label" data-role="label"></div>
+      <div class="pp-nums" data-role="calc"></div>
+    </div>
   </div>
   <div class="print-divider"></div>
   <div class="print-answers">
@@ -673,6 +708,10 @@
       <div class="pa-calc" data-role="calc"></div>
     </div>
     <div class="print-answer" data-index="2">
+      <div class="pa-label" data-role="label"></div>
+      <div class="pa-calc" data-role="calc"></div>
+    </div>
+    <div class="print-answer" data-index="3">
       <div class="pa-label" data-role="label"></div>
       <div class="pa-calc" data-role="calc"></div>
     </div>
@@ -782,14 +821,6 @@
     return { kind: "div", a: a, b: b, diff: unit, answer: Math.floor(a / b), remainder: a % b };
   }
 
-  // 날짜마다 단원 하나를 쉬게 해서 4개 단원이 돌아가며 나온다.
-  function defaultDivUnits() {
-    var d = new Date();
-    var dayNumber = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
-    var skip = dayNumber % DIV_UNITS.length;
-    return DIV_UNITS.filter(function (u, i) { return i !== skip; }).map(function (u) { return u.key; });
-  }
-
   var dateStr = todayKey();
 
   var MODES = {
@@ -807,7 +838,8 @@
       tagline: "3학년 2학기 나눗셈 연습",
       groupLabel: "단원 선택",
       levels: DIV_UNITS,
-      defaults: defaultDivUnits(),
+      fixedLevels: true,
+      defaults: DIV_UNITS.map(function (u) { return u.key; }),
       seed: dateStr + "#div",
       make: makeDivProblem
     }
@@ -1062,7 +1094,16 @@
     var cfg = MODES[p.kind];
 
     var group = card.querySelector(".diff-group");
-    if (group.getAttribute("data-mode") !== p.kind) {
+    if (cfg.fixedLevels) {
+      // 나눗셈은 카드마다 단원이 정해져 있어 고르는 버튼 대신 단원 이름만 보여준다.
+      group.setAttribute("data-mode", p.kind);
+      group.removeAttribute("aria-label");
+      group.innerHTML = "";
+      var tag = document.createElement("span");
+      tag.className = "unit-tag";
+      tag.textContent = levelName(p);
+      group.appendChild(tag);
+    } else if (group.getAttribute("data-mode") !== p.kind) {
       group.innerHTML = "";
       cfg.levels.forEach(function (level) {
         var btn = document.createElement("button");
@@ -1106,7 +1147,14 @@
 
   var tagline = document.getElementById("tagline");
   var modeTabs = Array.prototype.slice.call(document.querySelectorAll(".mode-tab"));
+  var printProblemEls = document.querySelectorAll(".print-problem");
+  var printAnswerEls = document.querySelectorAll(".print-answer");
+
   function renderMode() {
+    board.setAttribute("data-mode", mode);
+    cards.forEach(function (card, i) { card.hidden = i >= problems.length; });
+    printProblemEls.forEach(function (el, i) { el.hidden = i >= problems.length; });
+    printAnswerEls.forEach(function (el, i) { el.hidden = i >= problems.length; });
     modeTabs.forEach(function (tab) {
       tab.setAttribute("aria-pressed", tab.getAttribute("data-mode") === mode ? "true" : "false");
     });
@@ -1125,8 +1173,6 @@
     renderMode();
   });
 
-  var printProblemEls = document.querySelectorAll(".print-problem");
-  var printAnswerEls = document.querySelectorAll(".print-answer");
   function renderPrintSheet() {
     document.getElementById("print-sheet").setAttribute("data-mode", mode);
     problems.forEach(function (p, i) {
@@ -1430,7 +1476,7 @@
       replaceProblem(i, problems[i].diff, Math.random);
     }
     renderAll();
-    showToast(MODES[mode].name + " 문제 3개를 새로 냈어요");
+    showToast(MODES[mode].name + " 문제 " + problems.length + "개를 새로 냈어요");
   });
 
   function fileBase() {

@@ -221,6 +221,38 @@
     gap: 10px;
     flex-wrap: wrap;
   }
+  .card-label { display: flex; align-items: center; gap: 8px; }
+  .btn-cover {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--surface-border);
+    border-radius: 7px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    padding: 4px 8px;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .btn-cover svg { width: 14px; height: 14px; }
+  .btn-cover:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .btn-cover[aria-pressed="true"] { background: var(--amber-soft); border-color: var(--amber); color: var(--ink); }
+  .problem-wrap { position: relative; }
+  .card.is-covered .problem { visibility: hidden; }
+  .cover {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--surface-border);
+    border-radius: 10px;
+    background: repeating-linear-gradient(45deg, var(--paper), var(--paper) 10px, var(--surface) 10px, var(--surface) 20px);
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  .cover:hover { border-color: var(--accent); color: var(--accent-ink); }
   .problem-no {
     font-size: 0.8rem;
     font-weight: 500;
@@ -590,10 +622,16 @@
   <main class="board" id="board">
     <article class="card" data-index="0">
       <div class="card-top">
-        <span class="problem-no">문제 1</span>
+        <div class="card-label">
+          <span class="problem-no">문제 1</span>
+          <button type="button" class="btn-cover" data-action="cover" aria-pressed="false"></button>
+        </div>
         <div class="diff-group" role="group" aria-label="문제 1 난이도 선택"></div>
       </div>
-      <div class="problem"></div>
+      <div class="problem-wrap">
+        <div class="problem"></div>
+        <button type="button" class="cover" data-action="cover" hidden>가려진 문제 · 눌러서 보기</button>
+      </div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -611,10 +649,16 @@
 
     <article class="card" data-index="1">
       <div class="card-top">
-        <span class="problem-no">문제 2</span>
+        <div class="card-label">
+          <span class="problem-no">문제 2</span>
+          <button type="button" class="btn-cover" data-action="cover" aria-pressed="false"></button>
+        </div>
         <div class="diff-group" role="group" aria-label="문제 2 난이도 선택"></div>
       </div>
-      <div class="problem"></div>
+      <div class="problem-wrap">
+        <div class="problem"></div>
+        <button type="button" class="cover" data-action="cover" hidden>가려진 문제 · 눌러서 보기</button>
+      </div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -632,10 +676,16 @@
 
     <article class="card" data-index="2">
       <div class="card-top">
-        <span class="problem-no">문제 3</span>
+        <div class="card-label">
+          <span class="problem-no">문제 3</span>
+          <button type="button" class="btn-cover" data-action="cover" aria-pressed="false"></button>
+        </div>
         <div class="diff-group" role="group" aria-label="문제 3 난이도 선택"></div>
       </div>
-      <div class="problem"></div>
+      <div class="problem-wrap">
+        <div class="problem"></div>
+        <button type="button" class="cover" data-action="cover" hidden>가려진 문제 · 눌러서 보기</button>
+      </div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -653,10 +703,16 @@
 
     <article class="card" data-index="3">
       <div class="card-top">
-        <span class="problem-no">문제 4</span>
+        <div class="card-label">
+          <span class="problem-no">문제 4</span>
+          <button type="button" class="btn-cover" data-action="cover" aria-pressed="false"></button>
+        </div>
         <div class="diff-group" role="group" aria-label="문제 4 난이도 선택"></div>
       </div>
-      <div class="problem"></div>
+      <div class="problem-wrap">
+        <div class="problem"></div>
+        <button type="button" class="cover" data-action="cover" hidden>가려진 문제 · 눌러서 보기</button>
+      </div>
       <div class="card-actions">
         <button type="button" class="btn btn-shuffle" data-action="shuffle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
@@ -810,7 +866,8 @@
   }
 
   // 단원별로 가능한 [나뉠 수, 나누는 수] 조합을 모두 만들어 두고 그중에서 고른다.
-  // 몇십 · 몇십몇 · 세 자리는 자리마다 나누어떨어지는(내림 없는) 수만, 나머지는 몫이 한 자리인 수만 쓴다.
+  // 몇십 · 몇십몇 · 세 자리는 자리마다 나누어떨어지는(내림 없는) 수만 쓴다.
+  // 나머지는 나누어떨어지지 않는 모든 두 자리 수로, 십의 자리가 나누는 수보다 작은 경우(23÷4)와 큰 경우(47÷3)가 모두 나온다.
   // 몇십몇 · 세 자리에서 5 이상으로 나누면 55÷5=11처럼 몫이 1로만 이루어져 너무 쉬우므로 2~4로만 나눈다.
   function buildDivPools() {
     var pools = { "몇십": [], "몇십몇": [], "나머지": [], "세자리": [] };
@@ -827,7 +884,7 @@
           });
         });
       });
-      for (var a = 10; a < d * 10; a++) {
+      for (var a = 10; a < 100; a++) {
         if (a % d !== 0) pools["나머지"].push([a, d]);
       }
     }
@@ -886,7 +943,11 @@
     var cfg = MODES[m];
     var rng = mulberry32(hashString(cfg.seed));
     var list = cfg.defaults.map(function (diff) { return cfg.make(diff, rng); });
-    states[m] = { problems: list, history: list.map(function () { return []; }) };
+    states[m] = {
+      problems: list,
+      history: list.map(function () { return []; }),
+      covered: list.map(function () { return false; })
+    };
   });
 
   var MODE_KEY = "daily-math-mode";
@@ -901,11 +962,12 @@
     try { localStorage.setItem(MODE_KEY, m); } catch (err) {}
   }
 
-  var mode, problems, history;
+  var mode, problems, history, covered;
   function useMode(m) {
     mode = m;
     problems = states[m].problems;
     history = states[m].history;
+    covered = states[m].covered;
   }
   useMode(loadMode());
 
@@ -934,10 +996,17 @@
       var cur = r * 10 + digits[i];
       if (!started && cur < d && i < n - 1) { r = cur; continue; }
       var startCol = i - String(cur).length + 1;
+      var firstStep = !started;
       if (started) numRow(cur, i);
       started = true;
 
       var q = Math.floor(cur / d);
+      // 61÷3의 일의 자리처럼 내린 수가 나누는 수보다 작으면 몫에 0을 쓰고, 내린 수가 그대로 나머지가 된다.
+      if (q === 0 && !firstStep) {
+        quotient[i] = "0";
+        r = cur;
+        continue;
+      }
       var prod = q * d;
       quotient[i] = String(q);
       r = cur - prod;
@@ -1115,6 +1184,15 @@
   document.getElementById("today-date").textContent = todayDisplay;
   document.getElementById("print-date-text").textContent = todayDisplay;
 
+  var EYE_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+  var EYE_OFF_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>' +
+    '<path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>' +
+    '<line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+
   function renderCard(index) {
     var card = cards[index];
     var p = problems[index];
@@ -1157,6 +1235,13 @@
       problemEl.appendChild(workspace);
     }
     problemEl.setAttribute("aria-label", spokenText(p) + ", " + levelName(p));
+
+    var isCovered = covered[index];
+    card.classList.toggle("is-covered", isCovered);
+    card.querySelector(".cover").hidden = !isCovered;
+    var coverBtn = card.querySelector(".btn-cover");
+    coverBtn.setAttribute("aria-pressed", isCovered ? "true" : "false");
+    coverBtn.innerHTML = (isCovered ? EYE_ICON + "보이기" : EYE_OFF_ICON + "가리기");
 
     card.querySelector('[data-action="undo"]').disabled = history[index].length === 0;
   }
@@ -1485,6 +1570,9 @@
         }
       } else if (action === "check") {
         openAnswerModal(index);
+      } else if (action === "cover") {
+        covered[index] = !covered[index];
+        renderCard(index);
       }
     }
   });

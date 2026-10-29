@@ -901,24 +901,6 @@
 
   var dateStr = todayKey();
 
-  // 나눗셈 카드마다 고른 단원은 이 브라우저에 저장해 두고, 다시 열면 그대로 쓴다.
-  var DIV_UNITS_KEY = "daily-math-div-units";
-  function loadDivUnits() {
-    try {
-      var saved = JSON.parse(localStorage.getItem(DIV_UNITS_KEY));
-      if (Array.isArray(saved) && saved.length === DIV_UNITS.length &&
-          saved.every(function (key) { return DIV_POOLS[key]; })) {
-        return saved;
-      }
-    } catch (err) {}
-    return DIV_UNITS.map(function (u) { return u.key; });
-  }
-  function saveDivUnits(list) {
-    try {
-      localStorage.setItem(DIV_UNITS_KEY, JSON.stringify(list.map(function (p) { return p.diff; })));
-    } catch (err) {}
-  }
-
   var MODES = {
     mul: {
       name: "곱셈",
@@ -934,8 +916,7 @@
       tagline: "3학년 2학기 나눗셈 연습",
       groupLabel: "단원 선택",
       levels: DIV_UNITS,
-      // 처음에는 카드마다 단원 하나씩 순서대로, 그 뒤로는 저장된 선택을 쓴다.
-      defaults: loadDivUnits(),
+      defaults: DIV_UNITS.map(function (u) { return u.key; }),
       seed: dateStr + "#div",
       make: makeDivProblem
     }
@@ -956,11 +937,30 @@
     return p.a + " 나누기 " + p.b;
   }
 
+  // 카드마다 고른 난이도 · 단원은 모드별로 이 브라우저에 저장해 두고, 다시 열면 그대로 쓴다.
+  // 저장된 값이 없거나 맞지 않으면 각 모드의 기본값(defaults)을 쓴다.
+  var LEVELS_KEYS = { mul: "daily-math-mul-levels", div: "daily-math-div-units" };
+  function loadLevels(m) {
+    var cfg = MODES[m];
+    try {
+      var saved = JSON.parse(localStorage.getItem(LEVELS_KEYS[m]));
+      var valid = Array.isArray(saved) && saved.length === cfg.defaults.length &&
+        saved.every(function (key) { return cfg.levels.some(function (l) { return l.key === key; }); });
+      if (valid) return saved;
+    } catch (err) {}
+    return cfg.defaults;
+  }
+  function saveLevels(m, list) {
+    try {
+      localStorage.setItem(LEVELS_KEYS[m], JSON.stringify(list.map(function (p) { return p.diff; })));
+    } catch (err) {}
+  }
+
   var states = {};
   Object.keys(MODES).forEach(function (m) {
     var cfg = MODES[m];
     var rng = mulberry32(hashString(cfg.seed));
-    var list = cfg.defaults.map(function (diff) { return cfg.make(diff, rng); });
+    var list = loadLevels(m).map(function (diff) { return cfg.make(diff, rng); });
     states[m] = {
       problems: list,
       history: list.map(function () { return []; }),
@@ -1572,7 +1572,7 @@
       if (diff !== problems[index].diff) {
         replaceProblem(index, diff, Math.random);
         renderCard(index);
-        if (mode === "div") saveDivUnits(problems);
+        saveLevels(mode, problems);
       }
       return;
     }
@@ -1586,7 +1586,7 @@
         if (history[index].length > 0) {
           problems[index] = history[index].pop();
           renderCard(index);
-          if (mode === "div") saveDivUnits(problems);
+          saveLevels(mode, problems);
         }
       } else if (action === "check") {
         openAnswerModal(index);

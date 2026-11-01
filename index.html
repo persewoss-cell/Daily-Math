@@ -115,7 +115,7 @@
     border-bottom: 2px dashed var(--paper-line);
   }
   .brand { display: flex; align-items: center; gap: 12px; margin-right: auto; }
-  .brand svg { width: 40px; height: 40px; flex-shrink: 0; color: var(--accent); }
+  .brand-icon { width: 46px; height: 46px; flex-shrink: 0; }
   .brand h1 {
     font-family: var(--font-display);
     font-size: clamp(1.7rem, 3.4vw, 2.3rem);
@@ -593,14 +593,7 @@
 <div class="page">
   <header class="masthead">
     <div class="brand">
-      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="7" width="38" height="34" rx="4"></rect>
-        <line x1="5" y1="18" x2="43" y2="18"></line>
-        <line x1="16" y1="7" x2="16" y2="41"></line>
-        <line x1="29.5" y1="7" x2="29.5" y2="41"></line>
-        <line x1="11" y1="27" x2="21" y2="27"></line>
-        <line x1="24" y1="27" x2="34" y2="27"></line>
-      </svg>
+      <img class="brand-icon" src="icon-192.png" alt="" width="46" height="46" />
       <div>
         <h1>매일 수학</h1>
         <p class="tagline" id="tagline">두 자리 수 &times; 두 자리 수 곱셈 연습</p>
